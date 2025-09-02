@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-commerce API Test Dashboard - Lovelush Backend</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.2rem;
+        }
+
+        .section {
+            margin: 20px;
+            padding: 25px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+
+        .section h3 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .form-group label {
+            min-width: 140px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .success {
+            background: #28a745;
+        }
+
+        .success:hover {
+            background: #218838;
+        }
+
+        .danger {
+            background: #dc3545;
+        }
+
+        .danger:hover {
+            background: #c82333;
+        }
+
+        .warning {
+            background: #ffc107;
+        }
+
+        .warning:hover {
+            background: #e0a800;
+        }
+
+        .info {
+            background: #17a2b8;
+        }
+
+        .info:hover {
+            background: #138496;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .api-section {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .api-section h4 {
+            margin-top: 0;
+            color: #495057;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+        }
+
+        .status-area {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 15px;
+            height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .log-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .log-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .log-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .log-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .response-area {
+            background: #2d3748;
+            color: #e2e8f0;
+            border-radius: 6px;
+            padding: 15px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            margin-top: 15px;
+        }
+
+        .user-info {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .credits-info {
+            background: #f3e5f5;
+            border: 1px solid #9c27b0;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .product-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            border-color: #007bff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .product-card.selected {
+            border-color: #28a745;
+            background: #f8fff9;
+        }
+
+        .product-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .product-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+
+        .product-credits {
+            color: #28a745;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .product-description {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border: none;
+            background: #f8f9fa;
+            color: #666;
+            margin: 0;
+            border-radius: 0;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+            transform: none;
+        }
+
+        .tab.active {
+            background: white;
+            color: #007bff;
+            border-bottom: 2px solid #007bff;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .payment-flow {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .flow-step {
+            background: rgba(255, 255, 255, 0.1);
+            margin: 8px 0;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 4px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .product-details {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #495057;
+            min-width: 80px;
+        }
+
+        .detail-row span:last-child {
+            color: #212529;
+            word-break: break-word;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #007bff;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        .json-display {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛒 E-commerce API Test Dashboard</h1>
+            <p>Complete testing interface for Products, Payments & Credits Management</p>
+        </div>
+
+        <!-- Authentication Section -->
+        <div class="section">
+            <h3>🔐 Authentication</h3>
+            <div class="form-group">
+                <label>Username:</label>
+                <input id="loginUsername" type="text" placeholder="Enter username" value="user">
+            </div>
+            <div class="form-group">
+                <label>Password:</label>
+                <input id="loginPassword" type="password" placeholder="Enter password" value="stringst">
+            </div>
+            <div class="form-group">
+                <label>JWT Token:</label>
+                <input id="jwtToken" type="text" placeholder="Will be filled after login"
+                    style="font-family: monospace;" readonly>
+            </div>
+            <button id="loginBtn" class="success">Login & Get JWT</button>
+            <button id="logoutBtn" class="danger">Logout</button>
+            <button id="corsTestBtn" class="info">Test CORS</button>
+        </div>
+
+        <!-- User Info Section -->
+        <div class="user-info hidden" id="userInfo">
+            <h4>👤 User Information</h4>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                <div><strong>User ID:</strong> <span id="userId">-</span></div>
+                <div><strong>Username:</strong> <span id="userUsername">-</span></div>
+                <div><strong>Email:</strong> <span id="userEmail">-</span></div>
+            </div>
+        </div>
+
+        <!-- Credits Info Section -->
+        <div class="credits-info hidden" id="creditsInfo">
+            <h4>💳 Credits Balance</h4>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="currentBalance">-</div>
+                    <div class="stat-label">Current Balance</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalEarned">-</div>
+                    <div class="stat-label">Total Earned</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalSpent">-</div>
+                    <div class="stat-label">Total Spent</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="freeMatches">-</div>
+                    <div class="stat-label">Free Matches</div>
+                </div>
+            </div>
+            <button id="refreshCreditsBtn" class="info">Refresh Credits</button>
+        </div>
+
+        <!-- Main Testing Interface -->
+        <div class="section">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('products')">🛍️ Products</button>
+                <button class="tab" onclick="switchTab('payments')">💳 Payments</button>
+                <button class="tab" onclick="switchTab('credits')">🪙 Credits</button>
+                <button class="tab" onclick="switchTab('flow')">🔄 Complete Flow</button>
+            </div>
+
+            <!-- Products Tab -->
+            <div id="products" class="tab-content active">
+                <div class="dashboard-grid">
+                    <div class="api-section">
+                        <h4>Product Management</h4>
+
+                        <div class="form-group">
+                            <label>Title:</label>
+                            <input id="productTitle" type="text" placeholder="Premium Credit Pack"
+                                value="Premium Credit Pack">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Description:</label>
+                            <textarea id="productDescription"
+                                placeholder="Get 1000 credits for premium features">Get 1000 credits for premium features</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Price (cents):</label>
+                            <input id="productPrice" type="number" placeholder="999" value="999">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Currency:</label>
+                            <select id="productCurrency">
+                                <option value="XTR">Telegram Stars (XTR)</option>
+                                <option value="USD">US Dollar (USD)</option>
+                                <option value="CNY">Chinese Yuan (CNY)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Credits:</label>
+                            <input id="productCredits" type="number" placeholder="1000" value="1000">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Category:</label>
+                            <select id="productCategory">
+                                <option value="credits">Credit Package</option>
+                                <option value="subscription">Subscription</option>
+                                <option value="feature">Feature Unlock</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Photo URL:</label>
+                            <input id="productPhotoUrl" type="url" placeholder="https://example.com/image.jpg">
+                        </div>
+
+                        <button id="createProductBtn" class="success">Create Product</button>
+                        <button id="loadProductsBtn" class="info">Load All Products</button>
+                        <button id="loadActiveProductsBtn" class="warning">Load Active Only</button>
+                    </div>
+
+                    <div class="api-section">
+                        <h4>Product Actions</h4>
+
+                        <div class="form-group">
+                            <label>Product ID:</label>
+                            <input id="selectedProductId" type="text" placeholder="Select a product first" readonly>
+                        </div>
+
+                        <button id="getProductBtn" class="info" disabled>Get Product Details</button>
+                        <button id="updateProductBtn" class="warning" disabled>Update Product</button>
+                        <button id="deleteProductBtn" class="danger" disabled>Delete Product</button>
+                        <button id="activateProductBtn" class="success" disabled>Activate</button>
+                        <button id="deactivateProductBtn" class="danger" disabled>Deactivate</button>
+
+                        <div id="productDetailsSection" style="margin-top: 20px; display: none;">
+                            <h5>📋 Product Details</h5>
+                            <div id="productDetailsContent" class="product-details">
+                                <div class="detail-row">
+                                    <span class="detail-label">Title:</span>
+                                    <span id="detailTitle">-</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Description:</span>
+                                    <span id="detailDescription">-</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Price:</span>
+                                    <span id="detailPrice">-</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Currency:</span>
+                                    <span id="detailCurrency">-</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Credits:</span>
+                                    <span id="detailCredits">-</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Category:</span>
+                                    <span id="detailCategory">-</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Status:</span>
+                                    <span id="detailStatus">-</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Created:</span>
+                                    <span id="detailCreated">-</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Updated:</span>
+                                    <span id="detailUpdated">-</span>
+                                </div>
+                                <div class="detail-row" id="detailPhotoRow" style="display: none;">
+                                    <span class="detail-label">Photo:</span>
+                                    <img id="detailPhoto" src="" alt="Product Photo"
+                                        style="max-width: 100px; max-height: 100px; border-radius: 4px;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 20px;">
+                            <h5>Price Range Filter</h5>
+                            <div class="form-group">
+                                <label>Min Price:</label>
+                                <input id="minPrice" type="number" placeholder="0" value="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Max Price:</label>
+                                <input id="maxPrice" type="number" placeholder="2000" value="2000">
+                            </div>
+                            <button id="filterByPriceBtn" class="info">Filter by Price</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="productsGrid" class="product-grid">
+                    <div class="product-card">
+                        <div style="text-align: center; color: #666; font-style: italic; padding: 20px;">
+                            Click "Load All Products" to see available products
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payments Tab -->
+            <div id="payments" class="tab-content">
+                <div class="dashboard-grid">
+                    <div class="api-section">
+                        <h4>Payment Creation</h4>
+
+                        <div class="form-group">
+                            <label>Telegram User ID:</label>
+                            <input id="paymentUserId" type="text" placeholder="123456789" value="123456789">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Product ID:</label>
+                            <input id="paymentProductId" type="text" placeholder="Select product first" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Amount (cents):</label>
+                            <input id="paymentAmount" type="number" placeholder="999" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Invoice Payload:</label>
+                            <input id="paymentPayload" type="text" placeholder="premium_pack_001"
+                                value="premium_pack_001">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Expires At:</label>
+                            <input id="paymentExpires" type="datetime-local" value="">
+                        </div>
+
+                        <button id="createPaymentBtn" class="success" disabled>Create Payment</button>
+                        <button id="loadPaymentsBtn" class="info">Load All Payments</button>
+                        <button id="loadUserPaymentsBtn" class="warning">Load User Payments</button>
+                    </div>
+
+                    <div class="api-section">
+                        <h4>Payment Management</h4>
+
+                        <div class="form-group">
+                            <label>Payment ID:</label>
+                            <input id="selectedPaymentId" type="text" placeholder="Select payment first" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Status:</label>
+                            <select id="paymentStatus">
+                                <option value="pending">Pending</option>
+                                <option value="completed">Completed</option>
+                                <option value="failed">Failed</option>
+                                <option value="expired">Expired</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Telegram Charge ID:</label>
+                            <input id="telegramChargeId" type="text" placeholder="tg_charge_123">
+                        </div>
+
+                        <button id="getPaymentBtn" class="info" disabled>Get Payment</button>
+                        <button id="updatePaymentBtn" class="warning" disabled>Update Status</button>
+                        <button id="completePaymentBtn" class="success" disabled>Mark Completed</button>
+                        <button id="getPaymentStatsBtn" class="info">Payment Stats</button>
+                    </div>
+                </div>
+
+                <div id="paymentsArea" class="json-display">
+                    Click "Load All Payments" to see payment records
+                </div>
+            </div>
+
+            <!-- Credits Tab -->
+            <div id="credits" class="tab-content">
+                <div class="dashboard-grid">
+                    <div class="api-section">
+                        <h4>Credits Management</h4>
+
+                        <div class="form-group">
+                            <label>User ID:</label>
+                            <input id="creditsUserId" type="text" placeholder="123456789" value="123456789">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Amount:</label>
+                            <input id="creditsAmount" type="number" placeholder="100" value="100">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Reason:</label>
+                            <select id="creditsReason">
+                                <option value="purchase">Purchase</option>
+                                <option value="initial_grant">Initial Grant</option>
+                                <option value="match_consumption">Match Consumption</option>
+                                <option value="admin_adjustment">Admin Adjustment</option>
+                                <option value="refund_cancelled_chat">Refund</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Description:</label>
+                            <input id="creditsDescription" type="text" placeholder="Credits from purchase">
+                        </div>
+
+                        <button id="createUserCreditsBtn" class="success">Create User Account</button>
+                        <button id="addCreditsBtn" class="success">Add Credits</button>
+                        <button id="consumeCreditsBtn" class="warning">Consume Credits</button>
+                        <button id="getUserCreditsBtn" class="info">Get User Credits</button>
+                    </div>
+
+                    <div class="api-section">
+                        <h4>Credits Operations</h4>
+
+                        <div class="form-group">
+                            <label>Adjustment Amount:</label>
+                            <input id="adjustAmount" type="number" placeholder="50">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Initial Grant:</label>
+                            <input id="initialAmount" type="number" placeholder="50" value="50">
+                        </div>
+
+                        <button id="adjustCreditsBtn" class="warning">Adjust Credits</button>
+                        <button id="grantInitialBtn" class="success">Grant Initial Credits</button>
+                        <button id="ensureUserCreditsBtn" class="info">Ensure User Account</button>
+                        <button id="getTransactionsBtn" class="info">Get Transactions</button>
+                    </div>
+                </div>
+
+                <div id="creditsArea" class="json-display">
+                    Click "Get User Credits" to see credits information
+                </div>
+            </div>
+
+            <!-- Complete Flow Tab -->
+            <div id="flow" class="tab-content">
+                <div class="payment-flow">
+                    <h4 style="margin-top: 0;">🔄 Complete Purchase Flow Testing</h4>
+                    <div class="flow-step">
+                        <strong>Step 1:</strong> Create a product with credits reward
+                    </div>
+                    <div class="flow-step">
+                        <strong>Step 2:</strong> Create payment record for the product
+                    </div>
+                    <div class="flow-step">
+                        <strong>Step 3:</strong> Simulate successful payment completion
+                    </div>
+                    <div class="flow-step">
+                        <strong>Step 4:</strong> Add credits to user account
+                    </div>
+                    <div class="flow-step">
+                        <strong>Step 5:</strong> Verify user received credits
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin: 20px 0;">
+                    <button id="runCompleteFlowBtn" class="success" style="font-size: 16px; padding: 15px 30px;">
+                        🚀 Run Complete Flow Test
+                    </button>
+                </div>
+
+                <div id="flowResults" class="json-display">
+                    Click "Run Complete Flow Test" to execute end-to-end testing
+                </div>
+            </div>
+        </div>
+
+        <!-- Response Area -->
+        <div class="section">
+            <h3>📊 API Response</h3>
+            <button id="clearResponseBtn" class="warning">Clear Response</button>
+            <div id="responseArea" class="response-area"></div>
+        </div>
+
+        <!-- Logs Section -->
+        <div class="section">
+            <h3>📋 Activity Logs</h3>
+            <button id="clearLogsBtn" class="warning">Clear Logs</button>
+            <div id="statusArea" class="status-area"></div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentUser = null;
+        let jwtToken = null;
+        let selectedProduct = null;
+        let selectedPayment = null;
+        let allProducts = [];
+        let allPayments = [];
+
+        // API base URL
+        const API_BASE = 'http://127.0.0.1:8000/api/v1';
+
+        // Utility functions
+        function log(message, type = 'info') {
+            const statusArea = document.getElementById('statusArea');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type}`;
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
+            statusArea.appendChild(logEntry);
+            statusArea.scrollTop = statusArea.scrollHeight;
+        }
+
+        function clearLogs() {
+            document.getElementById('statusArea').innerHTML = '';
+        }
+
+        function clearResponse() {
+            document.getElementById('responseArea').innerHTML = '';
+        }
+
+        function displayResponse(data, status = 'success') {
+            const responseArea = document.getElementById('responseArea');
+            const timestamp = new Date().toLocaleTimeString();
+            const color = status === 'success' ? '#4ade80' : '#ef4444';
+
+            responseArea.innerHTML = `
+                <div style="color: ${color}; margin-bottom: 10px;">
+                    [${timestamp}] API Response (${status}):
+                </div>
+                <div style="color: #e2e8f0;">
+                    ${JSON.stringify(data, null, 2)}
+                </div>
+            `;
+            responseArea.scrollTop = responseArea.scrollHeight;
+        }
+
+        function getAuthHeaders() {
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            if (jwtToken) {
+                headers['Authorization'] = `Bearer ${jwtToken}`;
+            }
+            return headers;
+        }
+
+        function switchTab(tabName) {
+            // Remove active class from all tabs and content
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            // Add active class to selected tab and content
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        // Authentication functions
+        async function login() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+
+            if (!username || !password) {
+                log('Please enter username and password', 'error');
+                return;
+            }
+
+            try {
+                log('Attempting login...', 'info');
+
+                const formData = new URLSearchParams();
+                formData.append('username', username);
+                formData.append('password', password);
+
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+                displayResponse(result, response.ok ? 'success' : 'error');
+
+                if (!response.ok) {
+                    throw new Error(result.detail || result.msg || 'Login failed');
+                }
+
+                jwtToken = result.data.access_token;
+                currentUser = result.data.user;
+
+                // Update UI
+                document.getElementById('jwtToken').value = jwtToken;
+                document.getElementById('userId').textContent = currentUser.id;
+                document.getElementById('userUsername').textContent = currentUser.username;
+                document.getElementById('userEmail').textContent = currentUser.email || 'N/A';
+
+                document.getElementById('userInfo').classList.remove('hidden');
+
+                log(`Login successful! Welcome ${currentUser.username}`, 'success');
+
+                // Set default user IDs
+                document.getElementById('paymentUserId').value = currentUser.id;
+                document.getElementById('creditsUserId').value = currentUser.id;
+
+                // Automatically get credits info
+                await getUserCredits();
+
+            } catch (error) {
+                log(`Login failed: ${error.message}`, 'error');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            jwtToken = null;
+            selectedProduct = null;
+            selectedPayment = null;
+
+            // Clear UI
+            document.getElementById('jwtToken').value = '';
+            document.getElementById('userInfo').classList.add('hidden');
+            document.getElementById('creditsInfo').classList.add('hidden');
+
+            log('Logged out successfully', 'info');
+        }
+
+        async function testCORS() {
+            try {
+                log('Testing CORS connection...', 'info');
+
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'OPTIONS'
+                });
+
+                if (response.ok || response.status === 405) {
+                    log('✅ CORS test successful - backend is reachable', 'success');
+                } else {
+                    log(`❌ CORS test failed - status: ${response.status}`, 'error');
+                }
+
+            } catch (error) {
+                log(`❌ CORS test failed: ${error.message}`, 'error');
+                log('Make sure backend server is running on http://127.0.0.1:8000', 'warning');
+            }
+        }
+
+        // Product functions
+        async function createProduct() {
+            if (!jwtToken) {
+                log('Please login first', 'error');
+                return;
+            }
+
+            try {
+                const productData = {
+                    title: document.getElementById('productTitle').value,
+                    description: document.getElementById('productDescription').value,
+                    price: parseInt(document.getElementById('productPrice').value),
+                    currency: document.getElementById('productCurrency').value,
+                    credits: parseInt(document.getElementById('productCredits').value),
+                    category: document.getElementById('productCategory').value,
+                    photo_url: document.getElementById('productPhotoUrl').value || null,
+                    show_feature: true
+                };
+
+                log('Creating product...', 'info');
+
+                const response = await fetch(`${API_BASE}/products`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(productData)
+                });
+
+                const result = await response.json();
+                displayResponse(result, response.ok ? 'success' : 'error');
+
+                if (response.ok) {
+                    log(`Product created: ${result.data.product_id}`, 'success');
+                    await loadProducts();
+                } else {
+                    throw new Error(result.msg || 'Failed to create product');
+                }
+
+            } catch (error) {
+                log(`Failed to create product: ${error.message}`, 'error');
+            }
+        }
+
+        async function loadProducts() {
+            if (!jwtToken) {
+                log('Please login first', 'error');
+                return;
+            }
+
+            try {
+                log('Loading products...', 'info');
+
+                const response = await fetch(`${API_BASE}/products?limit=50`, {
+                    headers: getAuthHeaders()
+                });
+
+                const result = await response.json();
+                displayResponse(result, response.ok ? 'success' : 'error');
+
+                if (response.ok) {
+                    allProducts = result.data.products;
+                    displayProducts(allProducts);
+                    log(`Loaded ${allProducts.length} products`, 'success');
+                } else {
+                    throw new Error(result.msg || 'Failed to load products');
+                }
+
+            } catch (error) {
+                log(`Failed to load products: ${error.message}`, 'error');
+            }
+        }
+
+        async function loadActiveProducts() {
+            if (!jwtToken) {
+                log('Please login first', 'error');
+                return;
+            }
+
+            try {
+                log('Loading active products...', 'info');
+
+                const response = await fetch(`${API_BASE}/products/active/list?limit=50`, {
+                    headers: getAuthHeaders()
+                });
+
+                const result = await response.json();
+                displayResponse(result, response.ok ? 'success' : 'error');
+
+                if (response.ok) {
+                    const activeProducts = result.data.active_products;
+                    displayProducts(activeProducts);
+                    log(`Loaded ${activeProducts.length} active products`, 'success');
+                } else {
+                    throw new Error(result.msg || 'Failed to load active products');
+                }
+
+            } catch (error) {
+                log(`Failed to load active products: ${error.message}`, 'error');
+            }
+        }
+
+        function displayProducts(products) {
+            const grid = document.getElementById('productsGrid');
+
+            if (products.length === 0) {
+                grid.innerHTML = `
+                    <div class="product-card">
+                        <div style="text-align: center; color: #666; font-style: italic; padding: 20px;">
+                            No products found
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = '';
+
+            products.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+
+                card.innerHTML = `
+                    <div class="product-title">${product.title}</div>
+                    <div class="product-price">${product.price / 100} ${product.currency}</div>
+                    <div class="product-credits">+${product.credits} credits</div>
+                    <div class="product-description">${product.description}</div>
+                    <div style="font-size: 12px; color: #999;">
+                        Category: ${product.category} •
+                        Status: ${product.is_active ? 'Active' : 'Inactive'}
+                    </div>
+                    <div style="font-size: 11px; color: #999; margin-top: 8px;">
+                        ID: ${product.id}
+                    </div>
+                `;
+
+                card.onclick = () => selectProduct(product, card);
+                grid.appendChild(card);
+            });
+        }
+
+        function selectProduct(product, cardElement) {
+            // Update selected product
+            selectedProduct = product;
+
+            // Update UI
+            document.querySelectorAll('.product-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            cardElement.classList.add('selected');
+
+            // Fill in related forms
+            document.getElementById('selectedProductId').value = product.id;
+            document.getElementById('paymentProductId').value = product.id;
+            document.getElementById('paymentAmount').value = product.price;
+
+            // Auto-display product details
+            displayProductDetails(product);
+
+            // Enable buttons
+            document.getElementById('getProductBtn').disabled = false;
+            document.getElementById('updateProductBtn').disabled = false;
+            document.getElementById('deleteProductBtn').disabled = false;
+            document.getElementById('activateProductBtn').disabled = false;
+            document.getElementById('deactivateProductBtn').disabled = false;
+            document.getElementById('createPaymentBtn').disabled = false;
+
+            log(`Selected product: ${product.title}`, 'info');
+        }
+
+        // Payment functions
+        async function createPayment() {
+            if (!jwtToken || !selectedProduct) {
+                log('Please login and select a product first', 'error');
+                return;
+            }
+
+            try {
+                const expiresAt = document.getElementById('paymentExpires').value ||
+                    new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(); // 24h from now
+
+                const paymentData = {
+                    telegram_user_id: document.getElementById('paymentUserId').value,
+                    product_id: selectedProduct.id,
+                    amount: selectedProduct.price,
+                    currency: selectedProduct.currency,
+                    invoice_payload: document.getElementById('paymentPayload').value,
+                    expires_at: expiresAt
+                };
+
+                log('Creating payment...', 'info');
+
+                const response = await fetch(`${API_BASE}/payments`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(paymentData)
+                });
+
+                const result = await response.json();
+                displayResponse(result, response.ok ? 'success' : 'error');
+
+                if (response.ok) {
+                    log(`Payment created: ${result.data.payment_id}`, 'success');
+                    document.getElementById('selectedPaymentId').value = result.data.payment_id;
+                    selectedPayment = { id: result.data.payment_id, ...paymentData };
+
+                    // Enable payment buttons
+                    document.getElementById('getPaymentBtn').disabled = false;
+                    document.getElementById('updatePaymentBtn').disabled = false;
+                    document.getElementById('completePaymentBtn').disabled = false;
+                } else {
+                    throw new Error(result.msg || 'Failed to create payment');
+                }
+
+            } catch (error) {
+                log(`Failed to create payment: ${error.message}`, 'error');
+            }
+        }
+
+        async function completePayment() {
+            if (!selectedPayment) {
+                log('Please select a payment first', 'error');
+                return;
+            }
+
+            try {
+                log('Completing payment...', 'info');
+
+                const updates = {
+                    status: 'completed',
+                    telegram_payment_charge_id: document.getElementById('telegramChargeId').value || 'test_charge_123',
+                    telegram_provider_payment_charge_id: 'provider_456'
+                };
+
+                const response = await fetch(`${API_BASE}/payments/${selectedPayment.id}`, {
+                    method: 'PUT',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(updates)
+                });
+
+                const result = await response.json();
+                displayResponse(result, response.ok ? 'success' : 'error');
+
+                if (response.ok) {
+                    log('Payment completed successfully', 'success');
+
+                    // Auto-add credits to user
+                    if (selectedProduct) {
+                        await addCreditsFromPayment();
+                    }
+                } else {
+                    throw new Error(result.msg || 'Failed to complete payment');
+                }
+
+            } catch (error) {
+                log(`Failed to complete payment: ${error.message}`, 'error');
+            }
+        }
+
+        async function addCreditsFromPayment() {
+            if (!selectedProduct || !selectedPayment) return;
+
+            try {
+                log(`Adding ${selectedProduct.credits} credits from payment...`, 'info');
+
+                const response = await fetch(`${API_BASE}/credits/users/${selectedPayment.telegram_user_id}/add?amount=${selectedProduct.credits}&reason=purchase`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({
+                        description: `Credits from ${selectedProduct.title} purchase`
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    log(`Successfully added ${selectedProduct.credits} credits to user`, 'success');
+                    await getUserCredits(); // Refresh credits display
+                } else {
+                    log('Failed to add credits from payment', 'error');
+                }
+
+            } catch (error) {
+                log(`Failed to add credits from payment: ${error.message}`, 'error');
+            }
+        }
+
+        // Credits functions
+        async function getUserCredits() {
+            const userId = document.getElementById('creditsUserId').value;
+            if (!userId || !jwtToken) return;
+
+            try {
+                log('Getting user credits...', 'info');
+
+                const response = await fetch(`${API_BASE}/credits/users/${userId}`, {
+                    headers: getAuthHeaders()
+                });
+
+                const result = await response.json();
+                displayResponse(result, response.ok ? 'success' : 'error');
+
+                if (response.ok) {
+                    const credits = result.data;
+
+                    // Update credits display
+                    document.getElementById('currentBalance').textContent = credits.current_balance;
+                    document.getElementById('totalEarned').textContent = credits.total_earned;
+                    document.getElementById('totalSpent').textContent = credits.total_spent;
+                    document.getElementById('freeMatches').textContent = credits.free_matches_remaining;
+
+                    document.getElementById('creditsInfo').classList.remove('hidden');
+
+                    log(`User has ${credits.current_balance} credits`, 'success');
+                } else {
+                    log('User credits not found', 'warning');
+                }
+
+            } catch (error) {
+                log(`Failed to get user credits: ${error.message}`, 'error');
+            }
+        }
+
+        async function addCredits() {
+            const userId = document.getElementById('creditsUserId').value;
+            const amount = document.getElementById('creditsAmount').value;
+            const reason = document.getElementById('creditsReason').value;
+            const description = document.getElementById('creditsDescription').value;
+
+            if (!userId || !amount || !jwtToken) {
+                log('Please fill in required fields', 'error');
+                return;
+            }
+
+            try {
+                log(`Adding ${amount} credits to user ${userId}...`, 'info');
+
+                const response = await fetch(`${API_BASE}/credits/users/${userId}/add?amount=${amount}&reason=${reason}`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({ description })
+                });
+
+                const result = await response.json();
+                displayResponse(result, response.ok ? 'success' : 'error');
+
+                if (response.ok) {
+                    log(`Successfully added ${amount} credits`, 'success');
+                    await getUserCredits();
+                } else {
+                    throw new Error(result.msg || 'Failed to add credits');
+                }
+
+            } catch (error) {
+                log(`Failed to add credits: ${error.message}`, 'error');
+            }
+        }
+
+        // Product action functions
+        function displayProductDetails(product) {
+            document.getElementById('detailTitle').textContent = product.title || '-';
+            document.getElementById('detailDescription').textContent = product.description || '-';
+            document.getElementById('detailPrice').textContent = product.price ? `${product.price} ${product.currency}` : '-';
+            document.getElementById('detailCurrency').textContent = product.currency || '-';
+            document.getElementById('detailCredits').textContent = product.credits || '-';
+            document.getElementById('detailCategory').textContent = product.category || '-';
+            document.getElementById('detailStatus').innerHTML = product.is_active ?
+                '<span style="color: #28a745; font-weight: bold;">✓ Active</span>' :
+                '<span style="color: #dc3545; font-weight: bold;">✗ Inactive</span>';
+
+            // Format dates
+            const formatDate = (dateStr) => {
+                if (!dateStr) return '-';
+                try {
+                    return new Date(dateStr).toLocaleString();
+                } catch {
+                    return dateStr;
+                }
+            };
+
+            document.getElementById('detailCreated').textContent = formatDate(product.created_at);
+            document.getElementById('detailUpdated').textContent = formatDate(product.updated_at);
+
+            // Handle photo
+            const photoRow = document.getElementById('detailPhotoRow');
+            const photoImg = document.getElementById('detailPhoto');
+            if (product.photo_url) {
+                photoImg.src = product.photo_url;
+                photoRow.style.display = 'flex';
+            } else {
+                photoRow.style.display = 'none';
+            }
+
+            // Show the details section
+            document.getElementById('productDetailsSection').style.display = 'block';
+        }
+
+        async function getProductDetails() {
+            if (!selectedProduct || !jwtToken) {
+                log('Please select a product and login first', 'error');
+                return;
+            }
+
+            try {
+                log(`Getting details for product ${selectedProduct.id}`, 'info');
+
+                const response = await fetch(`${API_BASE}/products/${selectedProduct.id}`, {
+                    headers: getAuthHeaders()
+                });
+
+                const result = await response.json();
+                displayResponse(result, response.ok ? 'success' : 'error');
+
+                if (response.ok) {
+                    displayProductDetails(result.data);
+                    log('Product details retrieved successfully', 'success');
+                } else {
+                    throw new Error(result.msg || 'Failed to get product details');
+                }
+
+            } catch (error) {
+                log(`Failed to get product details: ${error.message}`, 'error');
+            }
+        }
+
+        async function updateProduct() {
+            if (!selectedProduct || !jwtToken) {
+                log('Please select a product and login first', 'error');
+                return;
+            }
+
+            try {
+                const updateData = {
+                    title: document.getElementById('productTitle').value,
+                    description: document.getElementById('productDescription').value,
+                    price: parseInt(document.getElementById('productPrice').value),
+                    currency: document.getElementById('productCurrency').value,
+                    credits: parseInt(document.getElementById('productCredits').value),
+                    category: document.getElementById('productCategory').value,
+                    photo_url: document.getElementById('productPhotoUrl').value || null
+                };
+
+                log(`Updating product ${selectedProduct.id}`, 'info');
+
+                const response = await fetch(`${API_BASE}/products/${selectedProduct.id}`, {
+                    method: 'PUT',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(updateData)
+                });
+
+                const result = await response.json();
+                displayResponse(result, response.ok ? 'success' : 'error');
+
+                if (response.ok) {
+                    log('Product updated successfully', 'success');
+                    await loadProducts();
+                } else {
+                    throw new Error(result.msg || 'Failed to update product');
+                }
+
+            } catch (error) {
+                log(`Failed to update product: ${error.message}`, 'error');
+            }
+        }
+
+        async function deleteProduct() {
+            if (!selectedProduct || !jwtToken) {
+                log('Please select a product and login first', 'error');
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to delete "${selectedProduct.title}"?`)) {
+                return;
+            }
+
+            try {
+                log(`Deleting product ${selectedProduct.id}`, 'info');
+
+                const response = await fetch(`${API_BASE}/products/${selectedProduct.id}`, {
+                    method: 'DELETE',
+                    headers: getAuthHeaders()
+                });
+
+                const result = await response.json();
+                displayResponse(result, response.ok ? 'success' : 'error');
+
+                if (response.ok) {
+                    log('Product deleted successfully', 'success');
+                    await loadProducts();
+
+                    // Clear selection
+                    selectedProduct = null;
+                    document.getElementById('selectedProductId').value = '';
+                    document.getElementById('paymentProductId').value = '';
+                    document.getElementById('paymentAmount').value = '';
+
+                    // Disable buttons
+                    document.getElementById('getProductBtn').disabled = true;
+                    document.getElementById('updateProductBtn').disabled = true;
+                    document.getElementById('deleteProductBtn').disabled = true;
+                    document.getElementById('activateProductBtn').disabled = true;
+                    document.getElementById('deactivateProductBtn').disabled = true;
+                    document.getElementById('createPaymentBtn').disabled = true;
+                } else {
+                    throw new Error(result.msg || 'Failed to delete product');
+                }
+
+            } catch (error) {
+                log(`Failed to delete product: ${error.message}`, 'error');
+            }
+        }
+
+        async function activateProduct() {
+            if (!selectedProduct || !jwtToken) {
+                log('Please select a product and login first', 'error');
+                return;
+            }
+
+            try {
+                log(`Activating product ${selectedProduct.id}`, 'info');
+
+                const response = await fetch(`${API_BASE}/products/${selectedProduct.id}/activate`, {
+                    method: 'PUT',
+                    headers: getAuthHeaders()
+                });
+
+                const result = await response.json();
+                displayResponse(result, response.ok ? 'success' : 'error');
+
+                if (response.ok) {
+                    log('Product activated successfully', 'success');
+                    await loadProducts();
+                } else {
+                    throw new Error(result.msg || 'Failed to activate product');
+                }
+
+            } catch (error) {
+                log(`Failed to activate product: ${error.message}`, 'error');
+            }
+        }
+
+        async function deactivateProduct() {
+            if (!selectedProduct || !jwtToken) {
+                log('Please select a product and login first', 'error');
+                return;
+            }
+
+            try {
+                log(`Deactivating product ${selectedProduct.id}`, 'info');
+
+                const response = await fetch(`${API_BASE}/products/${selectedProduct.id}/deactivate`, {
+                    method: 'PUT',
+                    headers: getAuthHeaders()
+                });
+
+                const result = await response.json();
+                displayResponse(result, response.ok ? 'success' : 'error');
+
+                if (response.ok) {
+                    log('Product deactivated successfully', 'success');
+                    await loadProducts();
+                } else {
+                    throw new Error(result.msg || 'Failed to deactivate product');
+                }
+
+            } catch (error) {
+                log(`Failed to deactivate product: ${error.message}`, 'error');
+            }
+        }
+
+        async function filterByPrice() {
+            if (!jwtToken) {
+                log('Please login first', 'error');
+                return;
+            }
+
+            try {
+                const minPrice = parseInt(document.getElementById('minPrice').value) || 0;
+                const maxPrice = parseInt(document.getElementById('maxPrice').value) || 10000;
+
+                log(`Filtering products by price range: ${minPrice} - ${maxPrice}`, 'info');
+
+                const response = await fetch(`${API_BASE}/products?min_price=${minPrice}&max_price=${maxPrice}&limit=50`, {
+                    headers: getAuthHeaders()
+                });
+
+                const result = await response.json();
+                displayResponse(result, response.ok ? 'success' : 'error');
+
+                if (response.ok) {
+                    const filteredProducts = result.data.products;
+                    displayProducts(filteredProducts);
+                    log(`Found ${filteredProducts.length} products in price range`, 'success');
+                } else {
+                    throw new Error(result.msg || 'Failed to filter products');
+                }
+
+            } catch (error) {
+                log(`Failed to filter products: ${error.message}`, 'error');
+            }
+        }
+
+        // Complete flow test
+        async function runCompleteFlow() {
+            const flowResults = document.getElementById('flowResults');
+            flowResults.innerHTML = 'Running complete flow test...\n\n';
+
+            try {
+                // Step 1: Create product
+                log('🔄 Step 1: Creating test product...', 'info');
+                const productData = {
+                    title: 'Test Flow Product',
+                    description: 'Test product for complete flow',
+                    price: 500,
+                    currency: 'XTR',
+                    credits: 250,
+                    category: 'credits'
+                };
+
+                const productResponse = await fetch(`${API_BASE}/products`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(productData)
+                });
+                const productResult = await productResponse.json();
+
+                if (!productResponse.ok) throw new Error('Failed to create product');
+
+                const productId = productResult.data.product_id;
+                flowResults.innerHTML += `✅ Step 1 Complete: Product created (${productId})\n\n`;
+
+                // Step 2: Create payment
+                log('🔄 Step 2: Creating payment record...', 'info');
+                const paymentData = {
+                    telegram_user_id: currentUser.id,
+                    product_id: productId,
+                    amount: 500,
+                    currency: 'XTR',
+                    invoice_payload: 'test_flow_001',
+                    expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+                };
+
+                const paymentResponse = await fetch(`${API_BASE}/payments`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(paymentData)
+                });
+                const paymentResult = await paymentResponse.json();
+
+                if (!paymentResponse.ok) throw new Error('Failed to create payment');
+
+                const paymentId = paymentResult.data.payment_id;
+                flowResults.innerHTML += `✅ Step 2 Complete: Payment created (${paymentId})\n\n`;
+
+                // Step 3: Complete payment
+                log('🔄 Step 3: Completing payment...', 'info');
+                const completeResponse = await fetch(`${API_BASE}/payments/${paymentId}`, {
+                    method: 'PUT',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({
+                        status: 'completed',
+                        telegram_payment_charge_id: 'test_charge_flow',
+                        telegram_provider_payment_charge_id: 'provider_flow'
+                    })
+                });
+
+                if (!completeResponse.ok) throw new Error('Failed to complete payment');
+                flowResults.innerHTML += `✅ Step 3 Complete: Payment marked as completed\n\n`;
+
+                // Step 4: Add credits
+                log('🔄 Step 4: Adding credits to user...', 'info');
+                const creditsResponse = await fetch(`${API_BASE}/credits/users/${currentUser.id}/add?amount=250&reason=purchase`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({
+                        description: 'Credits from Test Flow Product purchase'
+                    })
+                });
+
+                if (!creditsResponse.ok) throw new Error('Failed to add credits');
+                flowResults.innerHTML += `✅ Step 4 Complete: 250 credits added to user\n\n`;
+
+                // Step 5: Verify credits
+                log('🔄 Step 5: Verifying user credits...', 'info');
+                const verifyResponse = await fetch(`${API_BASE}/credits/users/${currentUser.id}`, {
+                    headers: getAuthHeaders()
+                });
+                const verifyResult = await verifyResponse.json();
+
+                if (verifyResponse.ok) {
+                    flowResults.innerHTML += `✅ Step 5 Complete: User now has ${verifyResult.data.current_balance} credits\n\n`;
+                    flowResults.innerHTML += `🎉 COMPLETE FLOW TEST SUCCESSFUL!\n\n`;
+                    flowResults.innerHTML += `Summary:\n`;
+                    flowResults.innerHTML += `- Product created: ${productData.title}\n`;
+                    flowResults.innerHTML += `- Payment processed: ${paymentData.amount / 100} ${paymentData.currency}\n`;
+                    flowResults.innerHTML += `- Credits awarded: ${productData.credits}\n`;
+                    flowResults.innerHTML += `- Final balance: ${verifyResult.data.current_balance}\n`;
+
+                    await getUserCredits(); // Refresh credits display
+                    log('🎉 Complete flow test successful!', 'success');
+                } else {
+                    throw new Error('Failed to verify credits');
+                }
+
+            } catch (error) {
+                flowResults.innerHTML += `❌ Flow test failed: ${error.message}\n`;
+                log(`❌ Complete flow test failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Initialize date input
+        function initializeDateInput() {
+            const expiresInput = document.getElementById('paymentExpires');
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            expiresInput.value = tomorrow.toISOString().slice(0, 16);
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function () {
+            // Auth buttons
+            document.getElementById('loginBtn').onclick = login;
+            document.getElementById('logoutBtn').onclick = logout;
+            document.getElementById('corsTestBtn').onclick = testCORS;
+
+            // Product buttons
+            document.getElementById('createProductBtn').onclick = createProduct;
+            document.getElementById('loadProductsBtn').onclick = loadProducts;
+            document.getElementById('loadActiveProductsBtn').onclick = loadActiveProducts;
+            document.getElementById('getProductBtn').onclick = getProductDetails;
+            document.getElementById('updateProductBtn').onclick = updateProduct;
+            document.getElementById('deleteProductBtn').onclick = deleteProduct;
+            document.getElementById('activateProductBtn').onclick = activateProduct;
+            document.getElementById('deactivateProductBtn').onclick = deactivateProduct;
+            document.getElementById('filterByPriceBtn').onclick = filterByPrice;
+
+            // Payment buttons
+            document.getElementById('createPaymentBtn').onclick = createPayment;
+            document.getElementById('completePaymentBtn').onclick = completePayment;
+
+            // Credits buttons
+            document.getElementById('addCreditsBtn').onclick = addCredits;
+            document.getElementById('getUserCreditsBtn').onclick = getUserCredits;
+            document.getElementById('refreshCreditsBtn').onclick = getUserCredits;
+
+            // Complete flow
+            document.getElementById('runCompleteFlowBtn').onclick = runCompleteFlow;
+
+            // Utility buttons
+            document.getElementById('clearLogsBtn').onclick = clearLogs;
+            document.getElementById('clearResponseBtn').onclick = clearResponse;
+
+            // Initialize
+            initializeDateInput();
+
+            log('E-commerce API Test Dashboard loaded! 🛒', 'success');
+            log('1. Login with your credentials', 'info');
+            log('2. Test individual APIs or run complete flow', 'info');
+            log('3. Monitor responses and logs for debugging', 'info');
+        });
+    </script>
+</body>
+
+</html>

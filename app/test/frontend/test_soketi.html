@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Soketi 私聊测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        #chat {
+            border: 1px solid #ccc;
+            height: 300px;
+            overflow-y: scroll;
+            margin-bottom: 10px;
+            padding: 5px;
+        }
+
+        #message {
+            width: 70%;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>FastAPI + Soketi 私聊测试</h2>
+    <div style="margin-bottom: 10px;">
+        <label>用户名: <input id="loginUsername" type="text" placeholder="alice" /></label>
+        <label style="margin-left: 10px;">密码: <input id="loginPassword" type="password" placeholder="••••••" /></label>
+        <button id="loginBtn" type="button" onclick="loginAndFill()">登录并获取JWT</button>
+    </div>
+    <div>
+        <label>当前用户ID: <input id="userId" type="text" placeholder="例如 1" /></label>
+    </div>
+    <div>
+        <label>目标用户ID: <input id="toUserId" type="text" placeholder="例如 2" /></label>
+    </div>
+    <div>
+        <label>JWT Token: <input id="jwt" type="text" placeholder="Bearer ..." style="width:400px;" /></label>
+    </div>
+
+    <div id="chat"></div>
+
+    <input id="message" type="text" placeholder="输入消息..." />
+    <button id="send">发送</button>
+
+    <script src="https://cdn.jsdelivr.net/npm/pusher-js@7.2.0/dist/web/pusher.min.js"></script>
+    <script>
+        let pusher, channel;
+
+        const chatBox = document.getElementById("chat");
+        const sendBtn = document.getElementById("send");
+
+        function logMessage(msg, type = 'info') {
+            const div = document.createElement("div");
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            if (type === 'error') div.style.color = 'red';
+            if (type === 'success') div.style.color = 'green';
+            if (type === 'warning') div.style.color = 'orange';
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+        async function loginAndFill() {
+            logMessage("🖱️ 点击了登录按钮，开始请求...", 'info');
+
+            const username = document.getElementById("loginUsername").value.trim();
+            const password = document.getElementById("loginPassword").value.trim();
+            if (!username || !password) {
+                logMessage("请输入用户名和密码", 'warning');
+                return;
+            }
+
+            try {
+                // ⬇️ Use form-encoded body (most FastAPI login endpoints expect this)
+                const form = new URLSearchParams();
+                form.set("username", username);
+                form.set("password", password);
+                // If your backend uses OAuth2PasswordRequestForm strictly, uncomment:
+                // form.set("grant_type", "password");
+                // form.set("scope", "");
+                // form.set("client_id", "");
+                // form.set("client_secret", "");
+
+                const resp = await fetch("http://127.0.0.1:8000/api/v1/auth/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "Accept": "application/json"
+                    },
+                    body: form.toString()
+                });
+
+                const result = await resp.json();
+
+                if (!resp.ok) {
+                    const errMsg = result?.msg || result?.detail || `HTTP ${resp.status}`;
+                    logMessage(`❌ 登录失败: ${errMsg}`, 'error');
+                    return;
+                }
+
+                // Expecting { code, msg, data: {...} }
+                if (!result || typeof result !== "object" || !result.data) {
+                    logMessage("❌ 登录返回数据格式不正确（缺少 data）", 'error');
+                    return;
+                }
+
+                const data = result.data;
+                const token = data.access_token;
+                const userId = data.user.id;
+
+                if (!token) {
+                    logMessage("❌ 未从返回中获取到 token（access_token/token）", 'error');
+                    return;
+                }
+                if (!userId) {
+                    logMessage("❌ 未从返回中获取到用户ID（user_id/id/uid）", 'error');
+                    return;
+                }
+
+                const jwtInput = document.getElementById("jwt");
+                const userIdInput = document.getElementById("userId");
+                jwtInput.value = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
+                userIdInput.value = userId;
+
+                logMessage(`✅ 登录成功（user_id=${userId}）。已填充 JWT 和 用户ID。`, 'success');
+
+                // 自动初始化 Pusher
+                initPusher();
+            } catch (e) {
+                logMessage(`❌ 登录请求异常: ${e.message}`, 'error');
+            }
+        }
+        // 初始化连接
+        function initPusher() {
+            const userId = document.getElementById("userId").value.trim();
+            const jwt = document.getElementById("jwt").value.trim();
+
+            if (!userId || !jwt) {
+                logMessage("请输入 用户ID 和 JWT Token", 'warning');
+                return;
+            }
+
+            if (pusher) {
+                pusher.disconnect();
+            }
+
+            logMessage("🔄 初始化 Pusher 连接...");
+
+            pusher = new Pusher("app-key", {
+                wsHost: "127.0.0.1",
+                wsPort: 6001,
+                forceTLS: false,
+                enabledTransports: ["ws"],
+                disableStats: true,
+                authorizer: (channel, options) => ({
+                    authorize: async (socketId, callback) => {
+                        try {
+                            const jwtInput = document.getElementById("jwt").value.trim();
+                            const token = jwtInput.startsWith('Bearer ') ? jwtInput : `Bearer ${jwtInput}`;
+                            const resp = await fetch("http://127.0.0.1:8000/api/v1/pusher/auth", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "Accept": "application/json",
+                                    "Authorization": token
+                                },
+                                body: JSON.stringify({
+                                    channel_name: channel.name,
+                                    socket_id: socketId
+                                })
+                            });
+                            const json = await resp.json();
+                            if (!resp.ok) {
+                                const errMsg = json?.msg || json?.detail || `HTTP ${resp.status}`;
+                                logMessage(`❌ 认证失败: ${errMsg}`, 'error');
+                                return callback(new Error(errMsg), null);
+                            }
+                            // 兼容后端包装：{code,msg,data:{auth, channel_data?}}
+                            const payload = json?.data || json;
+                            if (!payload?.auth) {
+                                logMessage(`❌ 认证返回缺少 auth 字段: ${JSON.stringify(json)}`, 'error');
+                                return callback(new Error("Missing auth in response"), null);
+                            }
+                            callback(null, payload);
+                        } catch (e) {
+                            logMessage(`❌ 认证异常: ${e.message}`, 'error');
+                            callback(e, null);
+                        }
+                    }
+                })
+            });
+
+            // 连接状态事件
+            pusher.connection.bind('connecting', () => {
+                logMessage("🔗 正在连接到 Soketi...", 'info');
+            });
+
+            pusher.connection.bind('connected', () => {
+                logMessage("✅ 已连接到 Soketi", 'success');
+                logMessage(`Socket ID: ${pusher.connection.socket_id}`, 'info');
+            });
+
+            pusher.connection.bind('disconnected', () => {
+                logMessage("❌ 连接已断开", 'error');
+            });
+
+            pusher.connection.bind('error', (err) => {
+                logMessage(`❌ 连接错误: ${JSON.stringify(err)}`, 'error');
+            });
+
+            pusher.connection.bind('failed', (err) => {
+                logMessage(`❌ 连接失败: ${JSON.stringify(err)}`, 'error');
+            });
+
+            // 订阅当前用户的私有频道
+            const channelName = `private-user-${userId}`;
+            logMessage(`🔔 订阅频道: ${channelName}`);
+
+            channel = pusher.subscribe(channelName);
+
+            channel.bind('pusher:subscription_succeeded', () => {
+                logMessage(`✅ 成功订阅频道: ${channelName}`, 'success');
+            });
+
+            channel.bind('pusher:subscription_error', (err) => {
+                logMessage(`❌ 订阅失败: ${JSON.stringify(err)}`, 'error');
+            });
+
+            channel.bind("new_message", (data) => {
+                logMessage(`📨 [收到消息] ${data.from_user_id} -> ${data.to_user_id}: ${data.body}`, 'success');
+            });
+        }
+
+        // 发送消息
+        async function sendMessage() {
+            const toUserId = document.getElementById("toUserId").value.trim();
+            const message = document.getElementById("message").value.trim();
+            const jwt = document.getElementById("jwt").value.trim();
+
+            if (!toUserId || !message || !jwt) {
+                logMessage("请输入 目标用户ID、消息 和 JWT Token", 'warning');
+                return;
+            }
+
+            try {
+                logMessage(`📤 发送消息给用户 ${toUserId}: ${message}`, 'info');
+
+                const response = await fetch(`http://127.0.0.1:8000/api/v1/pusher/messages/private/${toUserId}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": jwt.startsWith('Bearer ') ? jwt : `Bearer ${jwt}`
+                    },
+                    body: JSON.stringify({
+                        body: message,
+                        client_msg_id: Date.now().toString()
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    logMessage(`✅ 消息发送成功: ${result.msg}`, 'success');
+                    document.getElementById("message").value = "";
+                } else {
+                    logMessage(`❌ 发送失败: ${result.msg || result.detail}`, 'error');
+                }
+            } catch (error) {
+                logMessage(`❌ 发送错误: ${error.message}`, 'error');
+            }
+        }
+
+        sendBtn.onclick = sendMessage;
+
+        // 回车发送
+        document.getElementById("message").addEventListener("keypress", function (e) {
+            if (e.key === "Enter") {
+                sendMessage();
+            }
+        });
+
+        // 页面加载后绑定事件
+        window.onload = () => {
+            document.getElementById("userId").addEventListener("change", initPusher);
+            document.getElementById("jwt").addEventListener("change", initPusher);
+
+            // 添加手动连接按钮
+            const connectBtn = document.createElement("button");
+            connectBtn.textContent = "手动连接";
+            connectBtn.onclick = initPusher;
+            document.body.insertBefore(connectBtn, document.getElementById("chat"));
+
+            // 绑定登录按钮
+            const loginBtn = document.getElementById("loginBtn");
+            if (loginBtn) loginBtn.onclick = loginAndFill;
+
+            // 密码输入回车直接登录
+            const pwd = document.getElementById("loginPassword");
+            if (pwd) {
+                pwd.addEventListener("keypress", (e) => {
+                    if (e.key === "Enter") loginAndFill();
+                });
+            }
+
+            logMessage("🚀 页面已加载：可先登录获取 JWT（自动填入）再连接；或手动填入 JWT/用户ID 后点击手动连接。", 'info');
+        };
+
+    </script>
+</body>
+
+</html>

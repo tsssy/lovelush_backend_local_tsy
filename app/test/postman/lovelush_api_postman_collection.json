@@ -1,0 +1,2497 @@
+{
+  "info": {
+    "name": "LoveLush Backend API",
+    "description": "Comprehensive Postman collection for LoveLush Backend FastAPI application. Includes endpoints for user management, authentication, matching, credits management, message credit consumption, chatrooms, and real-time messaging.",
+    "version": "1.0.1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "user_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "agent_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "agent_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sub_account_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "chatroom_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "product_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "payment_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "settings_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "User Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\",\n  \"full_name\": \"Test User\",\n  \"bio\": \"Test user bio\",\n  \"age\": 25,\n  \"location\": \"New York\",\n  \"gender\": \"male\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "User Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.access_token) {",
+                  "        pm.collectionVariables.set('user_token', response.data.access_token);",
+                  "        pm.collectionVariables.set('refresh_token', response.data.refresh_token);",
+                  "        if (response.data.user && response.data.user.id) {",
+                  "            pm.collectionVariables.set('user_id', response.data.user.id);",
+                  "        }",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "username",
+                  "value": "testuser",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "password123",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh_token\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/refresh",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "refresh"]
+            }
+          }
+        },
+        {
+          "name": "Telegram Auth",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"telegram_init_data\": \"user=%7B%22id%22%3A123456%2C%22first_name%22%3A%22Test%22%2C%22last_name%22%3A%22User%22%2C%22username%22%3A%22testuser%22%7D&hash=test_hash&auth_date=1234567890\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/telegram",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "telegram"]
+            }
+          }
+        },
+        {
+          "name": "Update Last Visited",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"/dashboard\",\n  \"page\": \"dashboard\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/update-last-visited",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "update-last-visited"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Agents",
+      "item": [
+        {
+          "name": "Agent Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.access_token) {",
+                  "        pm.collectionVariables.set('agent_token', response.data.access_token);",
+                  "        if (response.data.agent && response.data.agent.id) {",
+                  "            pm.collectionVariables.set('agent_id', response.data.agent.id);",
+                  "        }",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "username",
+                  "value": "testagent",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "password123",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/agents/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "agents", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Sub-accounts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/agents/sub-accounts",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "agents", "sub-accounts"]
+            }
+          }
+        },
+        {
+          "name": "Create Sub-account",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.id) {",
+                  "        pm.collectionVariables.set('sub_account_id', response.data.id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"display_name\": \"Luna\",\n  \"bio\": \"A charming AI companion\",\n  \"age\": 22,\n  \"location\": \"Virtual Space\",\n  \"gender\": \"female\",\n  \"avatar_url\": \"https://example.com/avatar.jpg\",\n  \"photo_urls\": [\"https://example.com/photo1.jpg\"],\n  \"tags\": [\"friendly\", \"creative\"],\n  \"personality_traits\": [\"warm\", \"intelligent\"],\n  \"interests\": [\"art\", \"music\"],\n  \"conversation_style\": \"casual\",\n  \"response_speed\": \"normal\",\n  \"is_active\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/agents/sub-accounts",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "agents", "sub-accounts"]
+            }
+          }
+        },
+        {
+          "name": "Get Sub-account by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/agents/sub-accounts/{{sub_account_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "agents", "sub-accounts", "{{sub_account_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Sub-account",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"display_name\": \"Luna Updated\",\n  \"bio\": \"An updated AI companion\",\n  \"is_active\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/agents/sub-accounts/{{sub_account_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "agents", "sub-accounts", "{{sub_account_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Sub-account",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/agents/sub-accounts/{{sub_account_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "agents", "sub-accounts", "{{sub_account_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Send User Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"target_user_id\": \"{{user_id}}\",\n  \"message\": \"Hello from your AI companion!\",\n  \"notification_type\": \"agent.message\",\n  \"sub_account_id\": \"{{sub_account_id}}\",\n  \"chatroom_id\": \"{{chatroom_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/agents/notifications/send",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "agents", "notifications", "send"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get Current User Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "users", "me"]
+            }
+          }
+        },
+        {
+          "name": "Update Current User Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Test User Updated\",\n  \"bio\": \"Updated bio\",\n  \"location\": \"San Francisco\",\n  \"avatar_url\": \"https://example.com/new-avatar.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "users", "me"]
+            }
+          }
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/users/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "users", "{{user_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Users List",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/users?skip=0&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "users"],
+              "query": [
+                {
+                  "key": "skip",
+                  "value": "0"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Chatrooms",
+      "item": [
+        {
+          "name": "Get User Chatrooms",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/chatrooms?limit=20&include_last_messages=1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "chatrooms"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "include_last_messages",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Chatroom Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/chatrooms/{{chatroom_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "chatrooms", "{{chatroom_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Join Chatroom",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/chatrooms/{{chatroom_id}}/join",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "chatrooms", "{{chatroom_id}}", "join"]
+            }
+          }
+        },
+        {
+          "name": "Send Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Hello! How are you today?\",\n  \"message_type\": \"text\",\n  \"metadata\": {}\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/chatrooms/{{chatroom_id}}/messages",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "chatrooms", "{{chatroom_id}}", "messages"]
+            }
+          }
+        },
+        {
+          "name": "Get Chatroom Messages",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/chatrooms/{{chatroom_id}}/messages?page=1&page_size=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "chatrooms", "{{chatroom_id}}", "messages"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "page_size",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Send Typing Indicator",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"is_typing\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/chatrooms/{{chatroom_id}}/typing",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "chatrooms", "{{chatroom_id}}", "typing"]
+            }
+          }
+        },
+        {
+          "name": "Get Chatroom Participants",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/chatrooms/{{chatroom_id}}/participants",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "chatrooms", "{{chatroom_id}}", "participants"]
+            }
+          }
+        },
+        {
+          "name": "Leave Chatroom",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/chatrooms/{{chatroom_id}}/leave",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "chatrooms", "{{chatroom_id}}", "leave"]
+            }
+          }
+        },
+        {
+          "name": "End Chatroom",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/chatrooms/{{chatroom_id}}/end",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "chatrooms", "{{chatroom_id}}", "end"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Agent Chatrooms",
+      "item": [
+        {
+          "name": "Get Agent Chatrooms",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/agent/chatrooms?sub_account_id={{sub_account_id}}&limit=50",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "agent", "chatrooms"],
+              "query": [
+                {
+                  "key": "sub_account_id",
+                  "value": "{{sub_account_id}}"
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Agent Chatroom Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/agent/chatrooms/{{chatroom_id}}?sub_account_id={{sub_account_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "agent", "chatrooms", "{{chatroom_id}}"],
+              "query": [
+                {
+                  "key": "sub_account_id",
+                  "value": "{{sub_account_id}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Agent Send Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Hi there! I'm Luna, nice to meet you!\",\n  \"message_type\": \"text\",\n  \"metadata\": {}\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/agent/chatrooms/{{chatroom_id}}/messages?sub_account_id={{sub_account_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "agent", "chatrooms", "{{chatroom_id}}", "messages"],
+              "query": [
+                {
+                  "key": "sub_account_id",
+                  "value": "{{sub_account_id}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Agent Chatroom Messages",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/agent/chatrooms/{{chatroom_id}}/messages?sub_account_id={{sub_account_id}}&page=1&page_size=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "agent", "chatrooms", "{{chatroom_id}}", "messages"],
+              "query": [
+                {
+                  "key": "sub_account_id",
+                  "value": "{{sub_account_id}}"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "page_size",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Agent Send Typing Indicator",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"is_typing\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/agent/chatrooms/{{chatroom_id}}/typing?sub_account_id={{sub_account_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "agent", "chatrooms", "{{chatroom_id}}", "typing"],
+              "query": [
+                {
+                  "key": "sub_account_id",
+                  "value": "{{sub_account_id}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Agent End Chatroom",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/agent/chatrooms/{{chatroom_id}}/end?sub_account_id={{sub_account_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "agent", "chatrooms", "{{chatroom_id}}", "end"],
+              "query": [
+                {
+                  "key": "sub_account_id",
+                  "value": "{{sub_account_id}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Matching",
+      "item": [
+        {
+          "name": "Get Current Matches",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/matching/matches",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "matching", "matches"]
+            }
+          }
+        },
+        {
+          "name": "Request New Matches",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/matching/matches?use_paid_match=false",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "matching", "matches"],
+              "query": [
+                {
+                  "key": "use_paid_match",
+                  "value": "false"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Chat",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.chatroom_id) {",
+                  "        pm.collectionVariables.set('chatroom_id', response.data.chatroom_id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"{{user_id}}\",\n  \"sub_account_id\": \"{{sub_account_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/matching/chat",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "matching", "chat"]
+            }
+          }
+        },
+        {
+          "name": "End Chat",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/matching/chat/{{chatroom_id}}/end",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "matching", "chat", "{{chatroom_id}}", "end"]
+            }
+          }
+        },
+        {
+          "name": "Get Match History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/matching/matches/history?limit=50",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "matching", "matches", "history"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get User Credits",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/matching/credits",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "matching", "credits"]
+            }
+          }
+        },
+        {
+          "name": "Get Credit Transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/matching/credits/transactions?limit=50",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "matching", "credits", "transactions"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Credits",
+      "item": [
+        {
+          "name": "Create User Credits",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"{{user_id}}\",\n  \"initial_balance\": 100,\n  \"free_matches_per_day\": 3\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/credits/users",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "credits", "users"]
+            }
+          }
+        },
+        {
+          "name": "Get User Credits",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/credits/users/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "credits", "users", "{{user_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get User Transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/credits/users/{{user_id}}/transactions?limit=50&transaction_type=CREDIT",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "credits", "users", "{{user_id}}", "transactions"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50"
+                },
+                {
+                  "key": "transaction_type",
+                  "value": "CREDIT"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Credits",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/credits/users/{{user_id}}/add?amount=50&reason=PURCHASE&description=Test credit addition",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "credits", "users", "{{user_id}}", "add"],
+              "query": [
+                {
+                  "key": "amount",
+                  "value": "50"
+                },
+                {
+                  "key": "reason",
+                  "value": "PURCHASE"
+                },
+                {
+                  "key": "description",
+                  "value": "Test credit addition"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Consume Credits",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/credits/users/{{user_id}}/consume?amount=10&reason=MATCH_PAID&reference_id={{chatroom_id}}&description=Paid match consumption",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "credits", "users", "{{user_id}}", "consume"],
+              "query": [
+                {
+                  "key": "amount",
+                  "value": "10"
+                },
+                {
+                  "key": "reason",
+                  "value": "MATCH_PAID"
+                },
+                {
+                  "key": "reference_id",
+                  "value": "{{chatroom_id}}"
+                },
+                {
+                  "key": "description",
+                  "value": "Paid match consumption"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Consume Message Credits",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/credits/users/{{user_id}}/consume?amount=5&reason=MESSAGE_CONSUMPTION&reference_id={{chatroom_id}}&description=Message sent - credit consumption",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "credits", "users", "{{user_id}}", "consume"],
+              "query": [
+                {
+                  "key": "amount",
+                  "value": "5",
+                  "description": "Cost per message (configurable in app settings)"
+                },
+                {
+                  "key": "reason",
+                  "value": "MESSAGE_CONSUMPTION"
+                },
+                {
+                  "key": "reference_id",
+                  "value": "{{chatroom_id}}",
+                  "description": "Chatroom where message was sent"
+                },
+                {
+                  "key": "description",
+                  "value": "Message sent - credit consumption"
+                }
+              ]
+            },
+            "description": "Consume credits for sending a message. This is typically handled automatically when sending messages through the chatroom API."
+          },
+          "response": [
+            {
+              "name": "Success - Message credits consumed",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{user_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/credits/users/{{user_id}}/consume?amount=5&reason=MESSAGE_CONSUMPTION&reference_id={{chatroom_id}}&description=Message sent - credit consumption",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "credits", "users", "{{user_id}}", "consume"],
+                  "query": [
+                    {
+                      "key": "amount",
+                      "value": "5"
+                    },
+                    {
+                      "key": "reason",
+                      "value": "MESSAGE_CONSUMPTION"
+                    },
+                    {
+                      "key": "reference_id",
+                      "value": "{{chatroom_id}}"
+                    },
+                    {
+                      "key": "description",
+                      "value": "Message sent - credit consumption"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"code\": 200,\n  \"msg\": \"Credits consumed successfully\",\n  \"data\": {\n    \"user_id\": \"68aee0714b48d682f77f5a79\",\n    \"amount\": 5,\n    \"reason\": \"MESSAGE_CONSUMPTION\",\n    \"reference_id\": \"68af20ef39c0d9c69b7afdbb\",\n    \"description\": \"Message sent - credit consumption\"\n  }\n}"
+            },
+            {
+              "name": "Error - Insufficient credits",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{user_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/credits/users/{{user_id}}/consume?amount=5&reason=MESSAGE_CONSUMPTION&reference_id={{chatroom_id}}&description=Message sent - credit consumption",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "credits", "users", "{{user_id}}", "consume"],
+                  "query": [
+                    {
+                      "key": "amount",
+                      "value": "5"
+                    },
+                    {
+                      "key": "reason",
+                      "value": "MESSAGE_CONSUMPTION"
+                    },
+                    {
+                      "key": "reference_id",
+                      "value": "{{chatroom_id}}"
+                    },
+                    {
+                      "key": "description",
+                      "value": "Message sent - credit consumption"
+                    }
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"detail\": \"Insufficient credits or consumption failed\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Adjust Credits",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"{{user_id}}\",\n  \"amount\": 25,\n  \"reason\": \"ADJUSTMENT\",\n  \"description\": \"Manual credit adjustment\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/credits/users/{{user_id}}/adjust",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "credits", "users", "{{user_id}}", "adjust"]
+            }
+          }
+        },
+        {
+          "name": "Grant Initial Credits",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/credits/users/{{user_id}}/grant-initial?amount=50",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "credits", "users", "{{user_id}}", "grant-initial"],
+              "query": [
+                {
+                  "key": "amount",
+                  "value": "50"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Ensure User Credits",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/credits/users/{{user_id}}/ensure",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "credits", "users", "{{user_id}}", "ensure"]
+            }
+          }
+        },
+        {
+          "name": "Get User Message Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/credits/users/{{user_id}}/message-status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "credits", "users", "{{user_id}}", "message-status"]
+            },
+            "description": "Get user's current message sending status including available free messages, current credits, and sending permissions. Shows detailed information about messaging capabilities."
+          },
+          "response": [
+            {
+              "name": "Success - User with free messages available",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{user_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/credits/users/{{user_id}}/message-status",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "credits", "users", "{{user_id}}", "message-status"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"code\": 200,\n  \"msg\": \"User message status retrieved successfully\",\n  \"data\": {\n    \"can_send_message\": true,\n    \"available_free_messages\": 3,\n    \"total_free_messages\": 5,\n    \"free_messages_used\": 2,\n    \"current_credits\": 45,\n    \"message_cost\": 5,\n    \"total_sendable_messages\": 12,\n    \"reset_needed\": false,\n    \"last_reset_date\": \"2025-08-29T10:30:00Z\"\n  }\n}"
+            },
+            {
+              "name": "Success - User with no free messages but has credits",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{user_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/credits/users/{{user_id}}/message-status",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "credits", "users", "{{user_id}}", "message-status"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"code\": 200,\n  \"msg\": \"User message status retrieved successfully\",\n  \"data\": {\n    \"can_send_message\": true,\n    \"available_free_messages\": 0,\n    \"total_free_messages\": 5,\n    \"free_messages_used\": 5,\n    \"current_credits\": 25,\n    \"message_cost\": 5,\n    \"total_sendable_messages\": 5,\n    \"reset_needed\": false,\n    \"last_reset_date\": \"2025-08-29T10:30:00Z\"\n  }\n}"
+            },
+            {
+              "name": "Success - User cannot send messages (insufficient credits)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{user_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/credits/users/{{user_id}}/message-status",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "v1", "credits", "users", "{{user_id}}", "message-status"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"code\": 200,\n  \"msg\": \"User message status retrieved successfully\",\n  \"data\": {\n    \"can_send_message\": false,\n    \"available_free_messages\": 0,\n    \"total_free_messages\": 5,\n    \"free_messages_used\": 5,\n    \"current_credits\": 2,\n    \"message_cost\": 5,\n    \"total_sendable_messages\": 0,\n    \"reset_needed\": false,\n    \"last_reset_date\": \"2025-08-29T10:30:00Z\"\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Get Products List",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/products?limit=50&offset=0",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "products"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Product (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.product_id) {",
+                  "        pm.collectionVariables.set('product_id', response.data.product_id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"50 Credits Pack\",\n  \"description\": \"Buy 50 credits for premium matching\",\n  \"price\": 500,\n  \"currency\": \"TELEGRAM_STARS\",\n  \"credits\": 50,\n  \"category\": \"CREDITS\",\n  \"sequence\": 1,\n  \"is_active\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/products",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "products"]
+            }
+          }
+        },
+        {
+          "name": "Get Product by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/products/{{product_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "products", "{{product_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Product (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"50 Credits Pack - Updated\",\n  \"description\": \"Updated description for 50 credits pack\",\n  \"price\": 450\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/products/{{product_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "products", "{{product_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Products by Category",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/products/category/CREDITS?limit=50",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "products", "category", "CREDITS"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Active Products",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/products/active/list?limit=50",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "products", "active", "list"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Products by Price Range",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/products/price/range?min_price=100&max_price=1000&limit=50",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "products", "price", "range"],
+              "query": [
+                {
+                  "key": "min_price",
+                  "value": "100"
+                },
+                {
+                  "key": "max_price",
+                  "value": "1000"
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Activate Product (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/products/{{product_id}}/activate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "products", "{{product_id}}", "activate"]
+            }
+          }
+        },
+        {
+          "name": "Deactivate Product (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/products/{{product_id}}/deactivate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "products", "{{product_id}}", "deactivate"]
+            }
+          }
+        },
+        {
+          "name": "Get Product Statistics (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/products/stats/overview",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "products", "stats", "overview"]
+            }
+          }
+        },
+        {
+          "name": "Update Product Sort Order (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_sequences\": [\n    {\n      \"product_id\": \"{{product_id}}\",\n      \"sequence\": 1\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/products/sort",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "products", "sort"]
+            }
+          }
+        },
+        {
+          "name": "Get Products Sorted",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/products/list/sorted?limit=50&offset=0",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "products", "list", "sorted"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Product (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/products/{{product_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "products", "{{product_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "Create Payment Invoice",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.payment_id) {",
+                  "        pm.collectionVariables.set('payment_id', response.data.payment_id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/payments/invoice/create?telegram_user_id=123456789&product_id={{product_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "payments", "invoice", "create"],
+              "query": [
+                {
+                  "key": "telegram_user_id",
+                  "value": "123456789"
+                },
+                {
+                  "key": "product_id",
+                  "value": "{{product_id}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"telegram_user_id\": \"123456789\",\n  \"product_id\": \"{{product_id}}\",\n  \"amount\": 500,\n  \"currency\": \"TELEGRAM_STARS\",\n  \"invoice_payload\": \"test_payload_123\",\n  \"expires_at\": \"2024-12-31T23:59:59Z\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/payments",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "payments"]
+            }
+          }
+        },
+        {
+          "name": "Get Payment",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/payments/{{payment_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "payments", "{{payment_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Payment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"COMPLETED\",\n  \"telegram_payment_charge_id\": \"charge_123\",\n  \"completed_at\": \"2024-12-30T12:00:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/payments/{{payment_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "payments", "{{payment_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Get User Payments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/payments/user/{{user_id}}?limit=50",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "payments", "user", "{{user_id}}"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Payments by Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/payments/status/PENDING?limit=50",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "payments", "status", "PENDING"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Expired Payments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/payments/expired/list",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "payments", "expired", "list"]
+            }
+          }
+        },
+        {
+          "name": "Get Payment Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/payments/stats/overview",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "payments", "stats", "overview"]
+            }
+          }
+        },
+        {
+          "name": "Delete Payment",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/payments/{{payment_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "payments", "{{payment_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Settings",
+      "item": [
+        {
+          "name": "Create Settings (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.id) {",
+                  "        pm.collectionVariables.set('settings_id', response.data.id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"production-v2\",\n  \"description\": \"Production environment settings v2\",\n  \"match_config\": {\n    \"cost_per_match\": 10,\n    \"daily_free_matches\": 3,\n    \"initial_free_matches\": 5\n  },\n  \"coin_config\": {\n    \"initial_free_coins\": 100\n  },\n  \"message_config\": {\n    \"cost_per_message\": 5,\n    \"initial_free_messages\": 0\n  },\n  \"is_active\": true,\n  \"is_default\": false,\n  \"metadata\": {\n    \"environment\": \"production\",\n    \"version\": \"2.0\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/settings/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "settings", ""]
+            }
+          }
+        },
+        {
+          "name": "List Settings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/settings?include_inactive=false&limit=50&offset=0",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "settings"],
+              "query": [
+                {
+                  "key": "include_inactive",
+                  "value": "false"
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Active Settings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/settings/active",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "settings", "active"]
+            }
+          }
+        },
+        {
+          "name": "Get Default Settings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/settings/default",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "settings", "default"]
+            }
+          }
+        },
+        {
+          "name": "Get Settings by Name",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/settings/by-name/production",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "settings", "by-name", "production"]
+            }
+          }
+        },
+        {
+          "name": "Get Settings by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/settings/{{settings_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "settings", "{{settings_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Settings (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Updated production settings\",\n  \"match_config\": {\n    \"cost_per_match\": 15,\n    \"daily_free_matches\": 5,\n    \"initial_free_matches\": 8\n  },\n  \"coin_config\": {\n    \"initial_free_coins\": 150\n  },\n  \"message_config\": {\n    \"cost_per_message\": 8,\n    \"initial_free_messages\": 3\n  },\n  \"metadata\": {\n    \"environment\": \"production\",\n    \"version\": \"2.1\",\n    \"last_updated_by\": \"admin\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/settings/{{settings_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "settings", "{{settings_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Settings (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/settings/{{settings_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "settings", "{{settings_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Activate Settings (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/settings/{{settings_id}}/activate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "settings", "{{settings_id}}", "activate"]
+            }
+          }
+        },
+        {
+          "name": "Set Default Settings (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/settings/{{settings_id}}/set-default",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "settings", "{{settings_id}}", "set-default"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Maintenance (Admin)",
+      "item": [
+        {
+          "name": "Expire Old Matches",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/maintenance/matches/expire",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "maintenance", "matches", "expire"]
+            }
+          }
+        },
+        {
+          "name": "Get Match System Health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/maintenance/matches/health",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "maintenance", "matches", "health"]
+            }
+          }
+        },
+        {
+          "name": "Run Daily Maintenance",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/maintenance/matches/daily",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "maintenance", "matches", "daily"]
+            }
+          }
+        },
+        {
+          "name": "Cleanup Old Records",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{agent_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/maintenance/matches/cleanup?days_old=30",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "maintenance", "matches", "cleanup"],
+              "query": [
+                {
+                  "key": "days_old",
+                  "value": "30"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bot Messages",
+      "item": [
+        {
+          "name": "Get My Bot Messages",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/bot-messages/me?platform=TELEGRAM&page=1&page_size=20",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "bot-messages", "me"],
+              "query": [
+                {
+                  "key": "platform",
+                  "value": "TELEGRAM"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "page_size",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Bot Message by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/bot-messages/{{message_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "bot-messages", "{{message_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Mark Message as Processed",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/bot-messages/{{message_id}}/processed",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "bot-messages", "{{message_id}}", "processed"]
+            }
+          }
+        },
+        {
+          "name": "Get Unprocessed Messages",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/bot-messages/unprocessed?platform=TELEGRAM&limit=100",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "bot-messages", "unprocessed"],
+              "query": [
+                {
+                  "key": "platform",
+                  "value": "TELEGRAM"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pusher",
+      "item": [
+        {
+          "name": "Pusher Auth",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "channel_name",
+                  "value": "private-user-{{user_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "socket_id",
+                  "value": "123.456",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/pusher/auth",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "pusher", "auth"]
+            }
+          }
+        },
+        {
+          "name": "Get Pusher Config",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{user_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/pusher/config",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "pusher", "config"]
+            }
+          }
+        },
+        {
+          "name": "Pusher Webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"time_ms\": 1640995200000,\n  \"events\": [\n    {\n      \"name\": \"channel_occupied\",\n      \"channel\": \"presence-chatroom-{{chatroom_id}}\",\n      \"data\": {}\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/pusher/webhook",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "pusher", "webhook"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{user_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}

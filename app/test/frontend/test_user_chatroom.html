@@ -1,0 +1,1954 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Chat Interface - Lovelush</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+
+        .section h3 {
+            margin-top: 0;
+            color: #555;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group label {
+            min-width: 120px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-group input[type="password"] {
+            font-family: monospace;
+        }
+
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .success {
+            background: #28a745;
+        }
+
+        .danger {
+            background: #dc3545;
+        }
+
+        .warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .info {
+            background: #17a2b8;
+        }
+
+        .status-area {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .chat-container {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            height: 500px;
+        }
+
+        .chat-messages {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            overflow-y: auto;
+            background: white;
+        }
+
+        .chat-sidebar {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            background: white;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            max-width: 70%;
+        }
+
+        .message.user {
+            background: #007bff;
+            color: white;
+            margin-left: auto;
+        }
+
+        .message.agent {
+            background: #28a745;
+            color: white;
+        }
+
+        .message.system {
+            background: #6c757d;
+            color: white;
+            text-align: center;
+            max-width: 100%;
+            font-style: italic;
+        }
+
+        .message-input {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .message-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .candidates-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        .candidate-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .candidate-item:hover {
+            background: #f0f8ff;
+        }
+
+        .candidate-item:last-child {
+            border-bottom: none;
+        }
+
+        .typing-indicator {
+            font-style: italic;
+            color: #666;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .credits-info {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+
+        .chatrooms-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        .chatroom-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .chatroom-item:hover {
+            background: #f8f9fa;
+        }
+
+        .chatroom-item:last-child {
+            border-bottom: none;
+        }
+
+        .chatroom-item.active {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+        }
+
+        .chatroom-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .chatroom-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .chatroom-status {
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            text-transform: uppercase;
+        }
+
+        .chatroom-status.active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .chatroom-status.ended {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .chatroom-last-message {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .chatroom-timestamp {
+            font-size: 11px;
+            color: #999;
+        }
+
+        .message-pagination {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-top: 1px solid #ddd;
+            gap: 10px;
+        }
+
+        .message-pagination button {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        .log-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .log-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .log-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .log-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        /* Notification popup styles */
+        .notification-popup {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border: 2px solid #28a745;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            min-width: 300px;
+            max-width: 400px;
+            z-index: 9999;
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .notification-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .notification-content {
+            margin-bottom: 15px;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .notification-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .notification-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .notification-btn.accept {
+            background: #28a745;
+            color: white;
+        }
+
+        .notification-btn.accept:hover {
+            background: #218838;
+        }
+
+        .notification-btn.decline {
+            background: #6c757d;
+            color: white;
+        }
+
+        .notification-btn.decline:hover {
+            background: #5a6268;
+        }
+
+        .notification-close {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .notification-close:hover {
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💬 User Chat Interface</h1>
+            <p>Complete user interface for matching, chatrooms, and real-time messaging with presence-aware notifications</p>
+        </div>
+
+        <!-- Login Section -->
+        <div class="section">
+            <h3>🔐 Authentication</h3>
+            <div class="form-group">
+                <label>Username:</label>
+                <input id="loginUsername" type="text" placeholder="Enter username" value="testuser">
+            </div>
+            <div class="form-group">
+                <label>Password:</label>
+                <input id="loginPassword" type="password" placeholder="Enter password" value="password123">
+            </div>
+            <div class="form-group">
+                <label>JWT Token:</label>
+                <input id="jwtToken" type="text" placeholder="Will be filled automatically after login"
+                    style="font-family: monospace;">
+            </div>
+            <button id="loginBtn">Login & Get JWT</button>
+            <button id="logoutBtn" class="danger">Logout</button>
+            <button id="corsTestBtn" class="info">Test CORS Connection</button>
+        </div>
+
+        <!-- User Info Section -->
+        <div class="section">
+            <h3>👤 User Information</h3>
+            <div id="userInfo" class="hidden">
+                <div class="form-group">
+                    <label>User ID:</label>
+                    <input id="userId" type="text" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Username:</label>
+                    <input id="userUsername" type="text" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Email:</label>
+                    <input id="userEmail" type="text" readonly>
+                </div>
+            </div>
+        </div>
+
+        <!-- Credits & Matching Section -->
+        <div class="section">
+            <h3>💰 Credits & Matching</h3>
+            <div id="creditsInfo" class="credits-info hidden">
+                <div><strong>Current Balance:</strong> <span id="currentBalance">-</span> credits</div>
+                <div><strong>Free Matches:</strong> <span id="freeMatches">-</span> remaining</div>
+                <div><strong>Total Earned:</strong> <span id="totalEarned">-</span> credits</div>
+                <div><strong>Total Spent:</strong> <span id="totalSpent">-</span> credits</div>
+            </div>
+            <button id="getCreditsBtn" class="info">Get Credits Info</button>
+            <button id="getInitialMatchesBtn" class="success">Get Free Matches</button>
+            <button id="getNewMatchesBtn" class="warning">Get New Matches (Paid)</button>
+
+            <div id="matchCandidates" class="candidates-list hidden">
+                <!-- Match candidates will be populated here -->
+            </div>
+        </div>
+
+        <!-- Chatroom Section -->
+        <div class="section">
+            <h3>💬 Active Chatroom</h3>
+            <div id="chatroomInfo" class="hidden">
+                <div class="form-group">
+                    <label>Chatroom ID:</label>
+                    <input id="chatroomId" type="text" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Agent:</label>
+                    <input id="agentName" type="text" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Status:</label>
+                    <input id="chatroomStatus" type="text" readonly>
+                </div>
+                <button id="endChatBtn" class="danger">End Chat</button>
+                <button id="leaveChatBtn" class="warning">Leave Chat</button>
+            </div>
+        </div>
+
+        <!-- Chat Interface -->
+        <div class="section">
+            <h3>💬 Chat Interface</h3>
+            <div class="chat-container">
+                <div class="chat-messages-container">
+                    <div class="message-pagination">
+                        <button id="loadPreviousBtn" disabled>← Load Previous</button>
+                        <span id="messagesPagination">Messages: 0</span>
+                        <button id="loadNextBtn" disabled>Load Next →</button>
+                    </div>
+                    <div id="chatMessages" class="chat-messages">
+                        <div class="message system">Welcome! Please login and get matches to start chatting.</div>
+                    </div>
+                    <div class="typing-indicator hidden" id="typingIndicator">Agent is typing...</div>
+                    <div class="message-input">
+                        <input id="messageInput" type="text" placeholder="Type your message..." disabled>
+                        <button id="sendMessageBtn" disabled>Send</button>
+                    </div>
+                </div>
+                <div class="chat-sidebar">
+                    <h4>Chat Controls</h4>
+                    <button id="connectPusherBtn" class="info" disabled>Connect Real-time</button>
+                    <button id="disconnectPusherBtn" class="danger" disabled>Disconnect</button>
+                    <button id="loadMessagesBtn" class="info" disabled>Load Messages</button>
+                    <button id="refreshChatroomsBtn" class="warning" disabled>Refresh Chatrooms</button>
+                    <h4>My Chatrooms</h4>
+                    <div id="chatroomsList" class="chatrooms-list">
+                        <p>Login first to see your chatrooms</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status & Logs -->
+        <div class="section">
+            <h3>📊 Status & Logs</h3>
+            <button id="clearLogsBtn" class="warning">Clear Logs</button>
+            <div id="statusArea" class="status-area"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/pusher-js@7.2.0/dist/web/pusher.min.js"></script>
+    <script>
+        // Global variables
+        let currentUser = null;
+        let jwtToken = null;
+        let pusher = null;
+        let currentChatroom = null;
+        let currentChannel = null;
+        let typingTimeout = null;
+        let currentPage = 1;
+        let messagesPerPage = 20;
+        let totalMessages = 0;
+        let userChatrooms = [];
+
+        // API base URL
+        const API_BASE = 'http://127.0.0.1:8000/api/v1';
+
+        // Utility functions
+        function log(message, type = 'info') {
+            const statusArea = document.getElementById('statusArea');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type}`;
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
+            statusArea.appendChild(logEntry);
+            statusArea.scrollTop = statusArea.scrollHeight;
+        }
+
+        function clearLogs() {
+            document.getElementById('statusArea').innerHTML = '';
+        }
+
+        function getAuthHeaders() {
+            return {
+                'Authorization': `Bearer ${jwtToken}`,
+                'Content-Type': 'application/json'
+            };
+        }
+
+        // Authentication functions
+        async function testCORS() {
+            try {
+                log('Testing CORS connection to backend...', 'info');
+
+                const response = await fetch(`${API_BASE}/cors-test`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    log(`✅ CORS test successful! ${result.data.message}`, 'success');
+                    log(`Debug mode: ${result.data.debug}, CORS: ${result.data.cors}`, 'info');
+                } else {
+                    log(`❌ CORS test failed: ${result.detail || result.msg}`, 'error');
+                }
+
+            } catch (error) {
+                log(`❌ CORS test failed with error: ${error.message}`, 'error');
+                log('This is likely a CORS issue - make sure the backend server is running with CORS enabled', 'warning');
+            }
+        }
+
+        async function login() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+
+            if (!username || !password) {
+                log('Please enter username and password', 'error');
+                return;
+            }
+
+            try {
+                log('Attempting login...', 'info');
+
+                const formData = new URLSearchParams();
+                formData.append('username', username);
+                formData.append('password', password);
+
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.detail || result.msg || 'Login failed');
+                }
+
+                if (!result.data || !result.data.access_token) {
+                    throw new Error('Invalid response format');
+                }
+
+                jwtToken = result.data.access_token;
+                currentUser = result.data.user;
+
+                // 🔍 DEBUG: Check login data
+                log(`DEBUG: Login successful, currentUser set:`, 'success');
+                log(`DEBUG: currentUser.id = ${currentUser.id}`, 'info');
+
+                // Update UI
+                document.getElementById('jwtToken').value = jwtToken;
+                document.getElementById('userId').value = currentUser.id;
+                document.getElementById('userUsername').value = currentUser.username;
+                document.getElementById('userEmail').value = currentUser.email || 'N/A';
+
+                document.getElementById('userInfo').classList.remove('hidden');
+                document.getElementById('connectPusherBtn').disabled = false;
+                document.getElementById('refreshChatroomsBtn').disabled = false;
+
+                log(`Login successful! Welcome ${currentUser.username}`, 'success');
+
+                // Automatically get credits info
+                await getCreditsInfo();
+
+                // Load user's chatrooms
+                await loadUserChatrooms();
+
+            } catch (error) {
+                log(`Login failed: ${error.message}`, 'error');
+            }
+        }
+
+        function logout() {
+            if (pusher) {
+                pusher.disconnect();
+                pusher = null;
+            }
+
+            currentUser = null;
+            jwtToken = null;
+            currentChatroom = null;
+            currentChannel = null;
+
+            // Clear UI
+            document.getElementById('jwtToken').value = '';
+            document.getElementById('userInfo').classList.add('hidden');
+            document.getElementById('creditsInfo').classList.add('hidden');
+            document.getElementById('chatroomInfo').classList.add('hidden');
+            document.getElementById('matchCandidates').classList.add('hidden');
+
+            document.getElementById('connectPusherBtn').disabled = true;
+            document.getElementById('messageInput').disabled = true;
+            document.getElementById('sendMessageBtn').disabled = true;
+
+            log('Logged out successfully', 'info');
+        }
+
+        // Credits functions
+        async function getCreditsInfo() {
+            if (!jwtToken) {
+                log('Please login first', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/matching/credits`, {
+                    headers: getAuthHeaders()
+                });
+
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.detail || 'Failed to get credits');
+                }
+
+                const credits = result.data;
+                document.getElementById('currentBalance').textContent = credits.current_balance;
+                document.getElementById('freeMatches').textContent = credits.free_matches_remaining;
+                document.getElementById('totalEarned').textContent = credits.total_earned;
+                document.getElementById('totalSpent').textContent = credits.total_spent;
+
+                document.getElementById('creditsInfo').classList.remove('hidden');
+                log(`Credits loaded: ${credits.current_balance} balance, ${credits.free_matches_remaining} free matches`, 'success');
+
+            } catch (error) {
+                log(`Failed to get credits: ${error.message}`, 'error');
+            }
+        }
+
+        // Matching functions
+        async function getMatches(type = 'initial') {
+            if (!jwtToken || !currentUser) {
+                log('Please login first', 'error');
+                return;
+            }
+
+            try {
+                log(`Getting ${type} matches...`, 'info');
+
+                const response = await fetch(`${API_BASE}/matching/matches?use_paid_match=${type === 'new' ? true : false}`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({
+                        user_id: currentUser.id,
+                    })
+                });
+
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.detail || 'Failed to get matches');
+                }
+
+                const matches = result.data;
+                displayMatchCandidates(matches.candidates);
+
+                log(`Found ${matches.candidates.length} candidates. Credits consumed: ${matches.credits_consumed}`, 'success');
+
+                // Update credits info
+                await getCreditsInfo();
+
+            } catch (error) {
+                log(`Failed to get matches: ${error.message}`, 'error');
+            }
+        }
+
+        function displayMatchCandidates(candidates) {
+            const container = document.getElementById('matchCandidates');
+            container.innerHTML = '';
+
+            if (candidates.length === 0) {
+                container.innerHTML = '<div class="candidate-item">No candidates available</div>';
+                container.classList.remove('hidden');
+                return;
+            }
+
+            candidates.forEach(candidate => {
+                const item = document.createElement('div');
+                item.className = 'candidate-item';
+                item.innerHTML = `
+                    <div><strong>${candidate.display_name}</strong> (${candidate.agent_name})</div>
+                    <div style="font-size: 12px; color: #666; margin-top: 2px;">${candidate.bio || 'No bio available'}</div>
+                    ${candidate.age ? `<div style="font-size: 11px; color: #888;">Age: ${candidate.age}</div>` : ''}
+                    ${candidate.location ? `<div style="font-size: 11px; color: #888;">📍 ${candidate.location}</div>` : ''}
+                    ${candidate.tags && candidate.tags.length > 0 ? `<div style="font-size: 10px; color: #007bff; margin-top: 4px;">${candidate.tags.map(tag => `#${tag}`).join(' ')}</div>` : ''}
+                    ${candidate.photo_urls && candidate.photo_urls.length > 0 ? `<div style="font-size: 10px; color: #28a745; margin-top: 2px;">📸 ${candidate.photo_urls.length} photos</div>` : ''}
+                `;
+                item.onclick = () => createChatroom(candidate);
+                container.appendChild(item);
+            });
+
+            container.classList.remove('hidden');
+        }
+
+        // Chatroom listing functions
+        async function loadUserChatrooms() {
+            if (!jwtToken || !currentUser) {
+                document.getElementById('chatroomsList').innerHTML = '<p>Login first to see your chatrooms</p>';
+                return;
+            }
+
+            try {
+                log('Loading user chatrooms...', 'info');
+
+                const response = await fetch(`${API_BASE}/chatrooms/?limit=20&include_last_messages=1`, {
+                    headers: getAuthHeaders()
+                });
+
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.detail || 'Failed to load chatrooms');
+                }
+
+                userChatrooms = result.data.chatrooms || [];
+                displayChatroomsList(userChatrooms);
+
+                log(`Loaded ${userChatrooms.length} chatrooms`, 'success');
+
+            } catch (error) {
+                log(`Failed to load chatrooms: ${error.message}`, 'error');
+                document.getElementById('chatroomsList').innerHTML = '<p>Failed to load chatrooms</p>';
+            }
+        }
+
+        function displayChatroomsList(chatrooms) {
+            const container = document.getElementById('chatroomsList');
+
+            if (chatrooms.length === 0) {
+                container.innerHTML = '<p>No chatrooms found</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            chatrooms.forEach(chatroom => {
+                const item = document.createElement('div');
+                item.className = `chatroom-item ${currentChatroom?.id === chatroom.id ? 'active' : ''}`;
+
+                const lastMessage = chatroom.last_messages && chatroom.last_messages.length > 0
+                    ? chatroom.last_messages[0] : null;
+
+                const lastMessageText = lastMessage
+                    ? `${lastMessage.sender_type === 'user' ? 'You' : 'Agent'}: ${lastMessage.message.substring(0, 50)}${lastMessage.message.length > 50 ? '...' : ''}`
+                    : 'No messages yet';
+
+                const timestamp = lastMessage
+                    ? new Date(lastMessage.created_at).toLocaleString()
+                    : new Date(chatroom.created_at).toLocaleString();
+
+                item.innerHTML = `
+                    <div class="chatroom-info">
+                        <div class="chatroom-name">${chatroom.metadata?.participants?.agent?.display_name || chatroom.metadata?.participants?.agent?.name || 'Unknown Agent'}</div>
+                        <div class="chatroom-status ${chatroom.status}">${chatroom.status}</div>
+                    </div>
+                    <div class="chatroom-last-message">${lastMessageText}</div>
+                    <div class="chatroom-timestamp">${timestamp}</div>
+                `;
+
+                item.onclick = () => selectChatroom(chatroom);
+                container.appendChild(item);
+            });
+        }
+
+        async function selectChatroom(chatroom) {
+            try {
+                log(`Selecting chatroom with ${chatroom.metadata?.participants?.agent?.display_name}...`, 'info');
+
+                currentChatroom = chatroom;
+
+                // Update UI
+                document.getElementById('chatroomId').value = chatroom.id;
+                document.getElementById('agentName').value = chatroom.metadata?.participants?.agent?.display_name || chatroom.metadata?.participants?.agent?.name || 'Unknown';
+                document.getElementById('chatroomStatus').value = chatroom.status;
+                document.getElementById('chatroomInfo').classList.remove('hidden');
+
+                // Update chatrooms list highlighting
+                displayChatroomsList(userChatrooms);
+
+                // Enable controls if chatroom is active
+                if (chatroom.status === 'active') {
+                    document.getElementById('messageInput').disabled = false;
+                    document.getElementById('sendMessageBtn').disabled = false;
+                    document.getElementById('loadMessagesBtn').disabled = false;
+
+                    // Load messages
+                    await loadChatroomMessages(chatroom.id);
+
+                    // Connect to Pusher channel if connected
+                    if (pusher) {
+                        await connectToChatroomChannel();
+                    }
+                } else {
+                    document.getElementById('messageInput').disabled = true;
+                    document.getElementById('sendMessageBtn').disabled = true;
+                    document.getElementById('loadMessagesBtn').disabled = true;
+                }
+
+                log(`Chatroom selected successfully`, 'success');
+
+            } catch (error) {
+                log(`Failed to select chatroom: ${error.message}`, 'error');
+            }
+        }
+
+        // Message loading functions
+        async function loadChatroomMessages(chatroomId, page = 1) {
+            if (!jwtToken || !chatroomId) {
+                return;
+            }
+
+            try {
+                log(`Loading messages for chatroom (page ${page})...`, 'info');
+
+                const response = await fetch(`${API_BASE}/chatrooms/${chatroomId}/messages?page=${page}&page_size=${messagesPerPage}`, {
+                    headers: getAuthHeaders()
+                });
+
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.detail || 'Failed to load messages');
+                }
+
+                const paginationData = result.data;
+                const messages = paginationData.items || [];
+
+                currentPage = paginationData.page;
+                totalMessages = paginationData.total_items;
+
+                // Clear messages container if loading first page
+                const messagesContainer = document.getElementById('chatMessages');
+                if (page === 1) {
+                    messagesContainer.innerHTML = '';
+                }
+
+                // Display messages (reverse order since API returns newest first)
+                messages.reverse().forEach(message => {
+                    displayStoredMessage(message);
+                });
+
+                updateMessagesPagination();
+
+                log(`Loaded ${messages.length} messages (${totalMessages} total)`, 'success');
+
+            } catch (error) {
+                log(`Failed to load messages: ${error.message}`, 'error');
+            }
+        }
+
+        function displayStoredMessage(messageData) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+
+            let messageClass = 'message ';
+            if (messageData.sender_type === 'user') {
+                messageClass += 'user';
+            } else if (messageData.sender_type === 'agent') {
+                messageClass += 'agent';
+            } else {
+                messageClass += 'system';
+            }
+
+            messageDiv.className = messageClass;
+
+            const timestamp = new Date(messageData.created_at).toLocaleTimeString();
+            const senderInfo = messageData.sender_type === 'system' ? 'System' :
+                messageData.sender_type === 'user' ? 'You' : 'Agent';
+
+            messageDiv.innerHTML = `
+                <div style="font-size: 11px; opacity: 0.8; margin-bottom: 4px;">
+                    ${senderInfo} • ${timestamp}
+                </div>
+                <div>${messageData.message}</div>
+            `;
+
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function updateMessagesPagination() {
+            const paginationText = document.getElementById('messagesPagination');
+            const loadPreviousBtn = document.getElementById('loadPreviousBtn');
+            const loadNextBtn = document.getElementById('loadNextBtn');
+
+            paginationText.textContent = `Messages: ${totalMessages} (Page ${currentPage})`;
+
+            loadPreviousBtn.disabled = currentPage <= 1;
+            loadNextBtn.disabled = (currentPage * messagesPerPage) >= totalMessages;
+        }
+
+        async function loadPreviousMessages() {
+            if (currentChatroom && currentPage > 1) {
+                await loadChatroomMessages(currentChatroom.id, currentPage - 1);
+            }
+        }
+
+        async function loadNextMessages() {
+            if (currentChatroom && (currentPage * messagesPerPage) < totalMessages) {
+                await loadChatroomMessages(currentChatroom.id, currentPage + 1);
+            }
+        }
+
+        // Chatroom functions
+        async function createChatroom(candidate) {
+            if (!jwtToken || !currentUser) {
+                log('Please login first', 'error');
+                return;
+            }
+
+            try {
+                log(`Creating chatroom with ${candidate.display_name}...`, 'info');
+
+                // 🔍 DEBUG: Show what we're sending
+                log(`🔍 DEBUG: candidate.sub_account_id = ${candidate.sub_account_id}`, 'info');
+                log(`🔍 DEBUG: candidate.agent_id = ${candidate.agent_id}`, 'info');
+                log(`🔍 DEBUG: Sending sub_account_id: ${candidate.sub_account_id}`, 'info');
+
+                const response = await fetch(`${API_BASE}/matching/chat`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({
+                        user_id: currentUser.id,
+                        sub_account_id: candidate.sub_account_id
+                    })
+                });
+
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.detail || 'Failed to create chatroom');
+                }
+
+                currentChatroom = result.data;
+
+                // Update UI
+                document.getElementById('chatroomId').value = currentChatroom.id;
+                document.getElementById('agentName').value = candidate.display_name;
+                document.getElementById('chatroomStatus').value = currentChatroom.status;
+                document.getElementById('chatroomInfo').classList.remove('hidden');
+
+                // Hide candidates
+                document.getElementById('matchCandidates').classList.add('hidden');
+
+                log(`Chatroom created successfully with ${candidate.display_name}`, 'success');
+
+                // Auto-join the chatroom
+                await joinChatroom(currentChatroom.id);
+
+                // Refresh chatrooms list
+                await loadUserChatrooms();
+
+            } catch (error) {
+                log(`Failed to create chatroom: ${error.message}`, 'error');
+            }
+        }
+
+        async function joinChatroom(chatroomId) {
+            if (!jwtToken) {
+                log('Please login first', 'error');
+                return;
+            }
+
+            try {
+                log(`Joining chatroom ${chatroomId}...`, 'info');
+
+                const response = await fetch(`${API_BASE}/chatrooms/${chatroomId}/join`, {
+                    method: 'POST',
+                    headers: getAuthHeaders()
+                });
+
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.detail || 'Failed to join chatroom');
+                }
+
+                log('Successfully joined chatroom', 'success');
+
+                // Enable chat interface
+                document.getElementById('messageInput').disabled = false;
+                document.getElementById('sendMessageBtn').disabled = false;
+                document.getElementById('loadMessagesBtn').disabled = false;
+
+                // Load existing messages
+                await loadChatroomMessages(chatroomId);
+
+                // Connect to real-time if Pusher is connected
+                if (pusher) {
+                    await connectToChatroomChannel();
+                }
+
+            } catch (error) {
+                log(`Failed to join chatroom: ${error.message}`, 'error');
+            }
+        }
+
+        async function endChatroom() {
+            if (!currentChatroom || !jwtToken) {
+                log('No active chatroom', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/chatrooms/${currentChatroom.id}/end`, {
+                    method: 'POST',
+                    headers: getAuthHeaders()
+                });
+
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.detail || 'Failed to end chatroom');
+                }
+
+                log('Chatroom ended successfully', 'success');
+                resetChatroomUI();
+
+                // Refresh chatrooms list
+                await loadUserChatrooms();
+
+            } catch (error) {
+                log(`Failed to end chatroom: ${error.message}`, 'error');
+            }
+        }
+
+        function resetChatroomUI() {
+            currentChatroom = null;
+            document.getElementById('chatroomInfo').classList.add('hidden');
+            document.getElementById('messageInput').disabled = true;
+            document.getElementById('sendMessageBtn').disabled = true;
+            document.getElementById('loadMessagesBtn').disabled = true;
+            document.getElementById('loadPreviousBtn').disabled = true;
+            document.getElementById('loadNextBtn').disabled = true;
+
+            // Clear messages
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.innerHTML = '<div class="message system">No active chatroom</div>';
+            updateMessagesPagination();
+
+            if (currentChannel) {
+                pusher.unsubscribe(currentChannel.name);
+                currentChannel = null;
+            }
+        }
+
+        // Pusher functions
+        async function connectPusher() {
+            log('🔍 DEBUG: connectPusher() function called', 'info');
+            if (!jwtToken) {
+                log('Please login first', 'error');
+                return;
+            }
+
+            try {
+                log('Getting Pusher configuration...', 'info');
+
+                // Get Pusher config
+                const configResponse = await fetch(`${API_BASE}/pusher/config`, {
+                    headers: getAuthHeaders()
+                });
+
+                if (!configResponse.ok) {
+                    throw new Error('Failed to get Pusher config');
+                }
+
+                const configResult = await configResponse.json();
+                const config = configResult.data;
+
+                log('🔍 DEBUG: Pusher config received from backend:', 'info');
+                log(JSON.stringify(config, null, 2), 'info');
+
+                // 🔍 DEBUG: Construct the full auth endpoint URL
+                const baseUrl = API_BASE.replace('/api/v1', ''); // http://127.0.0.1:8000
+                const authEndpointUrl = config.auth_endpoint
+                    ? `${baseUrl}${config.auth_endpoint}`
+                    : `${API_BASE}/pusher/auth`;
+
+                log(`🔍 DEBUG: Auth endpoint URL: ${authEndpointUrl}`, 'info');
+
+                // 🔍 DEBUG: Check Pusher configuration
+                log(`🔍 DEBUG: Pusher key: ${config.key}`, 'info');
+                log(`🔍 DEBUG: Pusher cluster: ${config.cluster}`, 'info');
+                log(`🔍 DEBUG: Force TLS: ${config.forceTLS}`, 'info');
+
+                // Initialize Pusher with detailed configuration
+                const pusherConfig = {
+                    cluster: config.cluster || 'mt1',
+                    forceTLS: config.forceTLS !== undefined ? config.forceTLS : false,
+                    encrypted: config.forceTLS !== undefined ? config.forceTLS : false,
+                    disableStats: true,
+                    auth: {
+                        headers: {
+                            'Authorization': `Bearer ${jwtToken}`
+                        },
+                        params: {
+                            // Additional params can be passed here if needed
+                        }
+                    },
+                    authEndpoint: authEndpointUrl
+                };
+
+                // Add Soketi server details if provided
+                if (config.wsHost) {
+                    pusherConfig.wsHost = config.wsHost;
+                    pusherConfig.wsPort = config.wsPort || 6001;
+                    pusherConfig.wssPort = config.wssPort || config.wsPort || 6001;
+                    pusherConfig.enabledTransports = ['ws', 'wss'];
+
+                    log(`🔍 DEBUG: Using custom Soketi server: ${config.wsHost}:${config.wsPort}`, 'info');
+
+                    // For Soketi, we don't need cluster validation
+                    delete pusherConfig.cluster;
+                } else {
+                    log(`🔍 DEBUG: Using Pusher.com cloud service with cluster: ${pusherConfig.cluster}`, 'info');
+                }
+
+                log(`🔍 DEBUG: Final Pusher config:`, 'info');
+                log(JSON.stringify(pusherConfig, null, 2), 'info');
+
+                pusher = new Pusher(config.key, pusherConfig);
+
+                // Connection event handlers
+                pusher.connection.bind('connecting', () => {
+                    log('🔄 Connecting to Pusher...', 'info');
+                });
+
+                pusher.connection.bind('connected', () => {
+                    log('✅ Connected to Pusher successfully', 'success');
+                    log(`🔍 DEBUG: Pusher connection state: ${pusher.connection.state}`, 'info');
+                    document.getElementById('connectPusherBtn').disabled = true;
+                    document.getElementById('disconnectPusherBtn').disabled = false;
+
+                    // 🔥 NOW subscribe to channels after connection is established
+                    log('🔍 DEBUG: Now subscribing to private channels since Pusher is connected...', 'info');
+                    subscribeToPrivateUserNotifications();
+
+                    // If we have an active chatroom, connect to its channel
+                    if (currentChatroom) {
+                        connectToChatroomChannel();
+                    }
+                });
+
+                pusher.connection.bind('disconnected', () => {
+                    log('❌ Disconnected from Pusher', 'warning');
+                    document.getElementById('connectPusherBtn').disabled = false;
+                    document.getElementById('disconnectPusherBtn').disabled = true;
+                });
+
+                pusher.connection.bind('error', (err) => {
+                    log(`❌ Pusher connection error: ${JSON.stringify(err)}`, 'error');
+                });
+
+                pusher.connection.bind('failed', () => {
+                    log('❌ Pusher connection failed completely', 'error');
+                });
+
+                pusher.connection.bind('unavailable', () => {
+                    log('❌ Pusher connection unavailable', 'error');
+                });
+
+                // ❌ Don't subscribe immediately - wait for connection
+                // These will be called from the 'connected' event handler above
+
+            } catch (error) {
+                log(`Failed to connect to Pusher: ${error.message}`, 'error');
+            }
+        }
+
+        async function subscribeToPrivateUserNotifications() {
+            // 🔍 DEBUG: Check what we have
+            log(`DEBUG: pusher=${!!pusher}, currentUser=${!!currentUser}`, 'info');
+            if (currentUser) {
+                log(`DEBUG: currentUser.id=${currentUser.id}`, 'info');
+            }
+
+            if (!pusher || !currentUser) {
+                log('❌ Cannot subscribe to private user channel: missing pusher or currentUser', 'error');
+                return;
+            }
+
+            try {
+                // Subscribe to private-user-{user_id} channel for presence-aware notifications
+                const privateUserChannelName = `private-user-${currentUser.id}`;
+                log(`🔍 DEBUG: About to subscribe to private channel: ${privateUserChannelName}`, 'info');
+                log(`🔍 DEBUG: This should trigger a call to /pusher/auth endpoint`, 'info');
+                log(`🔍 DEBUG: Pusher connection state before subscription: ${pusher.connection.state}`, 'info');
+
+                const privateUserChannel = pusher.subscribe(privateUserChannelName);
+
+                log(`🔍 DEBUG: Subscription initiated, channel state: ${privateUserChannel.subscribed ? 'subscribed' : 'not subscribed'}`, 'info');
+
+                // Add timeout to detect hanging subscription
+                setTimeout(() => {
+                    if (!privateUserChannel.subscribed) {
+                        log(`⏰ Subscription timeout: ${privateUserChannelName} still not subscribed after 10s`, 'warning');
+                        log(`🔍 DEBUG: Check network tab for /pusher/auth calls - there should be a POST request`, 'warning');
+                        log(`🔍 DEBUG: Channel subscription state: ${privateUserChannel.subscribed}`, 'warning');
+                        log(`🔍 DEBUG: Pusher connection state: ${pusher.connection.state}`, 'warning');
+                    }
+                }, 10000);
+
+                privateUserChannel.bind('pusher:subscription_succeeded', () => {
+                    log('✅ Successfully subscribed to private user notifications', 'success');
+                    log('This channel receives presence-aware notifications when you\'re not subscribed to chatrooms', 'info');
+                });
+
+                privateUserChannel.bind('pusher:subscription_error', (err) => {
+                    log(`❌ Failed to subscribe to private user notifications: ${JSON.stringify(err)}`, 'error');
+                    log(`🔍 DEBUG: This error might indicate auth endpoint issues`, 'error');
+                });
+
+                // Handle match.created events (from matching service)
+                privateUserChannel.bind('match.created', (data) => {
+                    log('🎉 Received match.created notification', 'success');
+                    handleMatchCreatedNotification(data);
+                });
+
+                // Handle presence-aware message notifications (when not in chatroom)
+                privateUserChannel.bind('message.notify', (data) => {
+                    log('📥 Received message.notify (presence-aware routing)', 'info');
+                    handleMessageNotify(data);
+                });
+
+                // Handle agent messages/notifications sent directly to user
+                privateUserChannel.bind('agent.message', (data) => {
+                    log('💬 Received agent.message notification', 'info');
+                    handleAgentDirectMessage(data);
+                });
+
+                // Handle agent wants to start conversation notifications
+                privateUserChannel.bind('agent.wants_chat', (data) => {
+                    log('🤝 Received agent.wants_chat notification', 'info');
+                    handleAgentWantsChatNotification(data);
+                });
+
+                // Handle general notifications
+                privateUserChannel.bind('notification', (data) => {
+                    log('🔔 Received general notification', 'info');
+                    handlePrivateNotification(data);
+                });
+
+            } catch (error) {
+                log(`Failed to subscribe to private user notifications: ${error.message}`, 'error');
+            }
+        }
+
+        function handleMessageNotify(data) {
+            try {
+                log(`📥 Message notify from ${data.sender?.agent_name || 'agent'} in chatroom ${data.chatroom_id}`, 'info');
+                log(`Preview: ${data.message_preview}`, 'info');
+                log(`Action required: ${data.action_required}`, 'warning');
+
+                // Show notification popup to re-auth and subscribe to chatroom
+                showMessageNotifyPopup(data);
+
+            } catch (error) {
+                log(`Error handling message notify: ${error.message}`, 'error');
+            }
+        }
+
+        function handleAgentDirectMessage(data) {
+            try {
+                log(`📩 Direct message from agent: ${data.agent_name}`, 'info');
+
+                // Show notification popup for agent wanting to chat
+                showAgentChatRequestPopup(data);
+
+            } catch (error) {
+                log(`Error handling agent direct message: ${error.message}`, 'error');
+            }
+        }
+
+        function handleAgentWantsChatNotification(data) {
+            try {
+                log(`💬 Agent ${data.agent_name} wants to chat with you!`, 'info');
+
+                // Show notification popup
+                showAgentChatRequestPopup(data);
+
+            } catch (error) {
+                log(`Error handling agent chat request: ${error.message}`, 'error');
+            }
+        }
+
+        function handlePrivateNotification(data) {
+            try {
+                log(`🔔 Private notification: ${data.message}`, 'info');
+
+                // Show general notification
+                showGeneralNotificationPopup(data);
+
+            } catch (error) {
+                log(`Error handling private notification: ${error.message}`, 'error');
+            }
+        }
+
+        function showMessageNotifyPopup(data) {
+            // Create message notify popup for presence-aware routing
+            const popup = document.createElement('div');
+            popup.className = 'notification-popup';
+            popup.style.borderColor = '#17a2b8';
+            popup.innerHTML = `
+                <button class="notification-close" onclick="this.parentElement.remove()">&times;</button>
+                <div class="notification-header" style="color: #17a2b8;">
+                    📥 New Message Available
+                </div>
+                <div class="notification-content">
+                    You have a new message from <strong>${data.sender?.agent_name || 'an agent'}</strong>!<br>
+                    <em>"${data.message_preview}"</em><br><br>
+                    <small style="color: #666; margin-top: 5px; display: block;">
+                        Chatroom: ${data.chatroom_id}<br>
+                        Time: ${new Date(data.timestamp || Date.now()).toLocaleString()}<br>
+                        Action: ${data.action_required}
+                    </small>
+                </div>
+                <div class="notification-buttons">
+                    <button class="notification-btn decline" onclick="this.closest('.notification-popup').remove()">
+                        Dismiss
+                    </button>
+                    <button class="notification-btn accept" onclick="joinChatroomFromNotify('${data.chatroom_id}', '${data.chatroom_channel}', this.closest('.notification-popup'))">
+                        Join Chat
+                    </button>
+                </div>
+            `;
+
+            document.body.appendChild(popup);
+
+            // Auto-remove after 30 seconds
+            setTimeout(() => {
+                if (popup.parentNode) {
+                    popup.remove();
+                }
+            }, 30000);
+        }
+
+        function showAgentChatRequestPopup(data) {
+            // Create agent chat request popup
+            const popup = document.createElement('div');
+            popup.className = 'notification-popup';
+            popup.style.borderColor = '#17a2b8';
+            popup.innerHTML = `
+                <button class="notification-close" onclick="this.parentElement.remove()">&times;</button>
+                <div class="notification-header" style="color: #17a2b8;">
+                    💬 Agent Chat Request
+                </div>
+                <div class="notification-content">
+                    <strong>${data.agent_name || 'An Agent'}</strong> wants to start a conversation with you!<br>
+                    ${data.message ? `<em>"${data.message}"</em><br>` : ''}
+                    <small style="color: #666; margin-top: 5px; display: block;">
+                        Agent: ${data.agent_display_name || data.agent_name || 'Unknown'}<br>
+                        Time: ${new Date(data.timestamp || Date.now()).toLocaleString()}
+                    </small>
+                </div>
+                <div class="notification-buttons">
+                    <button class="notification-btn decline" onclick="declineAgentChat('${data.sub_account_id || data.agent_id}', this.closest('.notification-popup'))">
+                        Not Now
+                    </button>
+                    <button class="notification-btn accept" onclick="acceptAgentChat('${data.sub_account_id || data.agent_id}', '${data.agent_name}', this.closest('.notification-popup'))">
+                        Start Chat
+                    </button>
+                </div>
+            `;
+
+            document.body.appendChild(popup);
+
+            // Auto-remove after 30 seconds
+            setTimeout(() => {
+                if (popup.parentNode) {
+                    popup.remove();
+                }
+            }, 30000);
+        }
+
+        function showGeneralNotificationPopup(data) {
+            // Create general notification popup
+            const popup = document.createElement('div');
+            popup.className = 'notification-popup';
+            popup.innerHTML = `
+                <button class="notification-close" onclick="this.parentElement.remove()">&times;</button>
+                <div class="notification-header">
+                    🔔 ${data.title || 'Notification'}
+                </div>
+                <div class="notification-content">
+                    ${data.message}<br>
+                    <small style="color: #666; margin-top: 5px; display: block;">
+                        Time: ${new Date(data.timestamp || Date.now()).toLocaleString()}
+                    </small>
+                </div>
+                <div class="notification-buttons">
+                    <button class="notification-btn decline" onclick="this.closest('.notification-popup').remove()">
+                        Close
+                    </button>
+                </div>
+            `;
+
+            document.body.appendChild(popup);
+
+            // Auto-remove after 15 seconds
+            setTimeout(() => {
+                if (popup.parentNode) {
+                    popup.remove();
+                }
+            }, 15000);
+        }
+
+        async function acceptAgentChat(subAccountId, agentName, popupElement) {
+            try {
+                log(`Accepting chat request from agent: ${agentName}`, 'info');
+
+                // 🔍 DEBUG: Show what we're sending
+                log(`🔍 DEBUG: Received subAccountId parameter: ${subAccountId}`, 'info');
+                log(`🔍 DEBUG: Sending sub_account_id: ${subAccountId}`, 'info');
+
+                // Create a new chatroom with the agent
+                const response = await fetch(`${API_BASE}/matching/chat`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({
+                        user_id: currentUser.id,
+                        sub_account_id: subAccountId
+                    })
+                });
+
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.detail || 'Failed to create chatroom');
+                }
+
+                const chatroom = result.data;
+                log(`Created chatroom with ${agentName}: ${chatroom.id}`, 'success');
+
+                // Auto-join the chatroom
+                await joinChatroom(chatroom.id);
+
+                // Select the chatroom
+                currentChatroom = chatroom;
+                await selectChatroom(chatroom);
+
+                // Refresh chatrooms list
+                await loadUserChatrooms();
+
+                // Connect to Pusher if not already connected
+                if (!pusher && jwtToken) {
+                    await connectPusher();
+                }
+
+                popupElement.remove();
+
+            } catch (error) {
+                log(`Failed to accept agent chat: ${error.message}`, 'error');
+            }
+        }
+
+        async function joinChatroomFromNotify(chatroomId, chatroomChannel, popupElement) {
+            try {
+                log(`Joining chatroom from notify: ${chatroomId}`, 'info');
+
+                // First, find the chatroom in our list or load it
+                const chatroom = userChatrooms.find(c => c.id === chatroomId);
+                if (chatroom) {
+                    await selectChatroom(chatroom);
+                } else {
+                    // Refresh chatrooms and try again
+                    await loadUserChatrooms();
+                    const refreshedChatroom = userChatrooms.find(c => c.id === chatroomId);
+                    if (refreshedChatroom) {
+                        await selectChatroom(refreshedChatroom);
+                    } else {
+                        throw new Error('Chatroom not found');
+                    }
+                }
+
+                // Connect to Pusher if not already connected
+                if (!pusher && jwtToken) {
+                    await connectPusher();
+                }
+
+                log('Successfully joined chatroom from notification', 'success');
+                popupElement.remove();
+
+            } catch (error) {
+                log(`Failed to join chatroom from notify: ${error.message}`, 'error');
+            }
+        }
+
+        function declineAgentChat(subAccountId, popupElement) {
+            log(`Declined chat request from agent: ${subAccountId}`, 'info');
+            popupElement.remove();
+            // Note: In a real implementation, you might want to call an API to notify the agent
+        }
+
+        function handleMatchCreatedNotification(data) {
+            try {
+                log(`🎉 New match created! Conversation with ${data.peer.display_name}`, 'success');
+
+                // Show interactive notification popup
+                showNotificationPopup(data);
+
+                // Also show notification in chat area
+                displayMatchNotification(data);
+
+                // Auto-refresh chatrooms list to show new conversation
+                setTimeout(() => {
+                    loadUserChatrooms();
+                }, 1000);
+
+            } catch (error) {
+                log(`Error handling match notification: ${error.message}`, 'error');
+            }
+        }
+
+        function displayMatchNotification(data) {
+            // Create and show a temporary notification message in chat area
+            const messagesContainer = document.getElementById('chatMessages');
+            const notificationDiv = document.createElement('div');
+            notificationDiv.className = 'message system';
+            notificationDiv.style.backgroundColor = '#d4edda';
+            notificationDiv.style.color = '#155724';
+            notificationDiv.style.border = '1px solid #c3e6cb';
+
+            const timestamp = new Date(data.created_at).toLocaleTimeString();
+            notificationDiv.innerHTML = `
+                <div style="font-weight: bold; margin-bottom: 5px;">🎉 New Match Created!</div>
+                <div>You can now chat with ${data.peer.display_name || data.peer.name}</div>
+                <div style="font-size: 11px; margin-top: 5px; opacity: 0.8;">
+                    Conversation ID: ${data.conversation_id} • ${timestamp}
+                </div>
+            `;
+
+            messagesContainer.appendChild(notificationDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // Auto-remove notification after 10 seconds
+            setTimeout(() => {
+                if (notificationDiv.parentNode) {
+                    notificationDiv.remove();
+                }
+            }, 10000);
+        }
+
+        function showNotificationPopup(data) {
+            // Create notification popup
+            const popup = document.createElement('div');
+            popup.className = 'notification-popup';
+            popup.innerHTML = `
+                <button class="notification-close" onclick="this.parentElement.remove()">&times;</button>
+                <div class="notification-header">
+                    🎉 New Match Created!
+                </div>
+                <div class="notification-content">
+                    <strong>${data.peer.display_name || data.peer.name}</strong> wants to start a conversation with you!<br>
+                    <small style="color: #666; margin-top: 5px; display: block;">
+                        Conversation ID: ${data.conversation_id}<br>
+                        Time: ${new Date(data.created_at).toLocaleString()}
+                    </small>
+                </div>
+                <div class="notification-buttons">
+                    <button class="notification-btn decline" onclick="declineMatch('${data.conversation_id}', this.closest('.notification-popup'))">
+                        Decline
+                    </button>
+                    <button class="notification-btn accept" onclick="acceptMatch('${data.conversation_id}', this.closest('.notification-popup'))">
+                        Start Chatting
+                    </button>
+                </div>
+            `;
+
+            document.body.appendChild(popup);
+
+            // Auto-remove after 30 seconds if not acted upon
+            setTimeout(() => {
+                if (popup.parentNode) {
+                    popup.remove();
+                }
+            }, 30000);
+        }
+
+        async function acceptMatch(conversationId, popupElement) {
+            try {
+                log(`Accepting match for conversation: ${conversationId}`, 'info');
+
+                // Find the conversation in chatrooms list
+                const chatroom = userChatrooms.find(c => c.id === conversationId);
+                if (chatroom) {
+                    // Select and join the chatroom
+                    await selectChatroom(chatroom);
+                    log('Successfully joined the new conversation!', 'success');
+                } else {
+                    // If not found, refresh chatrooms and try again
+                    await loadUserChatrooms();
+                    const refreshedChatroom = userChatrooms.find(c => c.id === conversationId);
+                    if (refreshedChatroom) {
+                        await selectChatroom(refreshedChatroom);
+                        log('Successfully joined the new conversation!', 'success');
+                    } else {
+                        log('Could not find the conversation to join', 'warning');
+                    }
+                }
+
+                // Connect to Pusher if not already connected
+                if (!pusher && jwtToken) {
+                    await connectPusher();
+                }
+
+                // Remove popup
+                popupElement.remove();
+
+            } catch (error) {
+                log(`Failed to accept match: ${error.message}`, 'error');
+            }
+        }
+
+        function declineMatch(conversationId, popupElement) {
+            log(`Declined match for conversation: ${conversationId}`, 'info');
+            popupElement.remove();
+            // Note: In a real implementation, you might want to call an API to mark the match as declined
+        }
+
+        async function connectToChatroomChannel() {
+            if (!pusher || !currentChatroom) {
+                return;
+            }
+
+            try {
+                // Use the correct format for chatroom channels that matches our auth endpoint
+                const channelName = `presence-chatroom-${currentChatroom.id}`;
+                log(`🔍 DEBUG: About to subscribe to presence chatroom channel: ${channelName}`, 'info');
+                log(`🔍 DEBUG: This should also trigger a call to /pusher/auth endpoint`, 'info');
+
+                currentChannel = pusher.subscribe(channelName);
+
+                currentChannel.bind('pusher:subscription_succeeded', () => {
+                    log('✅ Successfully subscribed to chatroom channel', 'success');
+                });
+
+                currentChannel.bind('pusher:subscription_error', (err) => {
+                    log(`❌ Failed to subscribe to chatroom channel: ${JSON.stringify(err)}`, 'error');
+                    log(`🔍 DEBUG: Check network tab - there should be failed /pusher/auth calls`, 'error');
+                });
+
+                // Message events - direct delivery to chatroom (presence-aware)
+                currentChannel.bind('message.new', (data) => {
+                    log('📨 Received direct message in chatroom (presence-aware routing)', 'success');
+                    displayMessage(data);
+                });
+
+                currentChannel.bind('new_message', (data) => {
+                    displayMessage(data);
+                });
+
+                currentChannel.bind('system_message', (data) => {
+                    displayMessage(data);
+                });
+
+                currentChannel.bind('typing_indicator', (data) => {
+                    handleTypingIndicator(data);
+                });
+
+                currentChannel.bind('status_change', (data) => {
+                    handleStatusChange(data);
+                });
+
+            } catch (error) {
+                log(`Failed to connect to chatroom channel: ${error.message}`, 'error');
+            }
+        }
+
+        function disconnectPusher() {
+            if (pusher) {
+                pusher.disconnect();
+                pusher = null;
+                currentChannel = null;
+
+                document.getElementById('connectPusherBtn').disabled = false;
+                document.getElementById('refreshChatroomsBtn').disabled = true;
+                document.getElementById('loadMessagesBtn').disabled = true;
+
+                log('Disconnected from Pusher', 'info');
+            }
+        }
+
+        // Message functions
+        async function sendMessage() {
+            const messageText = document.getElementById('messageInput').value.trim();
+
+            if (!messageText || !currentChatroom || !jwtToken) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/chatrooms/${currentChatroom.id}/messages`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({
+                        message: messageText,
+                        message_type: 'text',
+                        metadata: {}
+                    })
+                });
+
+                const result = await response.json();
+                if (!response.ok) {
+                    throw new Error(result.detail || 'Failed to send message');
+                }
+
+                document.getElementById('messageInput').value = '';
+                log('Message sent successfully', 'success');
+
+            } catch (error) {
+                log(`Failed to send message: ${error.message}`, 'error');
+            }
+        }
+
+        function displayMessage(messageData) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+
+            let messageClass = 'message ';
+            if (messageData.sender_type === 'user') {
+                messageClass += 'user';
+            } else if (messageData.sender_type === 'agent') {
+                messageClass += 'agent';
+            } else {
+                messageClass += 'system';
+            }
+
+            messageDiv.className = messageClass;
+
+            const timestamp = new Date(messageData.timestamp).toLocaleTimeString();
+            const senderInfo = messageData.sender_type === 'system' ? 'System' :
+                messageData.sender_type === 'user' ? 'You' : 'Agent';
+
+            messageDiv.innerHTML = `
+                <div style="font-size: 11px; opacity: 0.8; margin-bottom: 4px;">
+                    ${senderInfo} • ${timestamp}
+                </div>
+                <div>${messageData.message}</div>
+            `;
+
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function handleTypingIndicator(data) {
+            const indicator = document.getElementById('typingIndicator');
+
+            if (data.sender_id !== currentUser?.id) { // Only show if it's not our own typing
+                if (data.is_typing) {
+                    indicator.classList.remove('hidden');
+                } else {
+                    indicator.classList.add('hidden');
+                }
+            }
+        }
+
+        function handleStatusChange(data) {
+            log(`Chatroom status changed: ${data.status}`, 'info');
+
+            if (data.status === 'ended') {
+                log('Chatroom has been ended', 'warning');
+                resetChatroomUI();
+            }
+        }
+
+        // Typing indicator for current user
+        function handleTyping() {
+            if (!currentChatroom || !jwtToken) return;
+
+            // Send typing indicator
+            fetch(`${API_BASE}/chatrooms/${currentChatroom.id}/typing`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({ is_typing: true })
+            });
+
+            // Clear previous timeout
+            if (typingTimeout) {
+                clearTimeout(typingTimeout);
+            }
+
+            // Stop typing after 2 seconds
+            typingTimeout = setTimeout(() => {
+                fetch(`${API_BASE}/chatrooms/${currentChatroom.id}/typing`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({ is_typing: false })
+                });
+            }, 2000);
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function () {
+            // Auth buttons
+            document.getElementById('loginBtn').onclick = login;
+            document.getElementById('logoutBtn').onclick = logout;
+            document.getElementById('corsTestBtn').onclick = testCORS;
+
+            // Credits & matching buttons
+            document.getElementById('getCreditsBtn').onclick = getCreditsInfo;
+            document.getElementById('getInitialMatchesBtn').onclick = () => getMatches('initial');
+            document.getElementById('getNewMatchesBtn').onclick = () => getMatches('new');
+
+            // Chatroom buttons
+            document.getElementById('endChatBtn').onclick = endChatroom;
+            document.getElementById('leaveChatBtn').onclick = () => {
+                log('Leave chat functionality not implemented in this test', 'warning');
+            };
+
+            // Pusher buttons
+            document.getElementById('connectPusherBtn').onclick = connectPusher;
+            document.getElementById('disconnectPusherBtn').onclick = disconnectPusher;
+
+            // Message loading buttons
+            document.getElementById('loadMessagesBtn').onclick = () => {
+                if (currentChatroom) {
+                    loadChatroomMessages(currentChatroom.id, 1);
+                }
+            };
+            document.getElementById('refreshChatroomsBtn').onclick = loadUserChatrooms;
+            document.getElementById('loadPreviousBtn').onclick = loadPreviousMessages;
+            document.getElementById('loadNextBtn').onclick = loadNextMessages;
+
+            // Message controls
+            document.getElementById('sendMessageBtn').onclick = sendMessage;
+            document.getElementById('messageInput').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                } else {
+                    handleTyping();
+                }
+            });
+
+            // Logs
+            document.getElementById('clearLogsBtn').onclick = clearLogs;
+
+            // Login on Enter in password field
+            document.getElementById('loginPassword').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    login();
+                }
+            });
+
+            log('User chat interface loaded successfully! 💬', 'success');
+            log('🔐 1. Login with your credentials', 'info');
+            log('🎯 2. Get matches to find agents', 'info');
+            log('💬 3. Create chatroom with an agent', 'info');
+            log('🔴 4. Connect to Pusher for real-time chat', 'info');
+            log('📡 5. Presence-aware notifications will route messages intelligently', 'info');
+        });
+    </script>
+</body>
+
+</html>
