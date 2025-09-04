@@ -137,7 +137,7 @@ def create_application() -> FastAPI:
     cors_origins = settings.cors_origins
     if settings.debug:
         # In debug mode, be more permissive with CORS
-        cors_origins = ["*"] if not cors_origins else cors_origins
+        cors_origins = ["*"]  # Force allow all origins for debugging
 
     application.add_middleware(
         CORSMiddleware,
