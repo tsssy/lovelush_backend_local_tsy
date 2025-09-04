@@ -586,7 +586,7 @@ class MatchingService:
         agent_start_offset = user_hash % len(agents)
 
         candidates = []
-        max_rounds = 3  # Limit rounds to prevent infinite loops
+        max_rounds = 5  # Increased to handle single agent with multiple sub_accounts
 
         for round_num in range(max_rounds):
             round_candidates = await self._get_candidates_from_user_aware_round(
@@ -608,7 +608,7 @@ class MatchingService:
             return []
 
         candidates = []
-        max_rounds = 3  # Limit rounds to prevent infinite loops
+        max_rounds = 5  # Increased to handle single agent with multiple sub_accounts
 
         for _ in range(max_rounds):
             round_candidates = await self._get_candidates_from_round(agents)
