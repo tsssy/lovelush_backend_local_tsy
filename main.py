@@ -142,7 +142,7 @@ def create_application() -> FastAPI:
     application.add_middleware(
         CORSMiddleware,
         allow_origins=cors_origins,
-        allow_credentials=True,
+        allow_credentials=False,  # Disable credentials so wildcard origins (*) work reliably in WebView
         allow_methods=["*"],
         allow_headers=["*"],
     )

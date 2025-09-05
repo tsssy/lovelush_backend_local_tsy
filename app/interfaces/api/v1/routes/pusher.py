@@ -274,9 +274,7 @@ async def pusher_auth(
 
 
 @router.get("/config", response_model=dict, summary="Get Pusher configuration")
-async def pusher_config(
-    current_user_or_agent=Depends(get_current_user_or_agent),
-) -> Dict[str, Any]:
+async def pusher_config() -> Dict[str, Any]:
     """
     Get public Pusher configuration for frontend clients.
 

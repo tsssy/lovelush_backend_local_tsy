@@ -8,6 +8,7 @@ from app.interfaces.telegram.common.types import (
     TelegramInlineKeyboardButton,
     TelegramInlineKeyboardMarkup,
     TelegramReplyKeyboardRemove,
+    TelegramWebAppInfo,
 )
 
 LOCATION_MAP = {
@@ -97,7 +98,16 @@ class UIRenderer:
         if location:
             location_name = LOCATION_MAP.get(location.lower(), location.title())
             button_text = f"💕 Chat with girls in {location_name}"
-        button = TelegramInlineKeyboardButton(text=button_text, url=url)
+        # Append ngrok skip warning param to avoid interstitial page in WebView
+        if url and "ngrok-free.app" in url and "ngrok-skip-browser-warning" not in url:
+            sep = "&" if "?" in url else "?"
+            url = f"{url}{sep}ngrok-skip-browser-warning=true"
+
+        # Use Telegram Web App button so it opens the Mini App inside Telegram instead of external browser
+        button = TelegramInlineKeyboardButton(
+            text=button_text,
+            web_app=TelegramWebAppInfo(url=url),
+        )
         return TelegramInlineKeyboardMarkup([[button]])
 
     @staticmethod
@@ -108,7 +118,13 @@ class UIRenderer:
         web_app_url = (
             f"{settings.telegram_mini_app_url}?startapp=chatroom-{chatroom_id}"
         )
-        button = TelegramInlineKeyboardButton(text="💬 Open Chat", url=web_app_url)
+        if "ngrok-free.app" in web_app_url and "ngrok-skip-browser-warning" not in web_app_url:
+            web_app_url += "&ngrok-skip-browser-warning=true"
+        # Ensure chatroom notifications also open inside Telegram Web App
+        button = TelegramInlineKeyboardButton(
+            text="💬 Open Chat",
+            web_app=TelegramWebAppInfo(url=web_app_url),
+        )
         return TelegramInlineKeyboardMarkup([[button]])
 
     @staticmethod
